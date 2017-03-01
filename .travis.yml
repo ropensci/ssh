@@ -2,8 +2,6 @@
 
 language: r
 cache: packages
-sudo: required
-dist: trusty
 
 matrix:
   include:

@@ -2,9 +2,19 @@
 % Please edit documentation in R/tunnel.R
 \name{blocking_tunnel}
 \alias{blocking_tunnel}
+\alias{me}
 \title{SSH tunnel}
 \usage{
 blocking_tunnel(host = "dev.opencpu.org", port = 22, user = me())
+
+me()
+}
+\arguments{
+\item{host}{a hostname}
+
+\item{port}{a number}
+
+\item{user}{the username to authenticate with}
 }
 \description{
 Create an SSH tunnel
