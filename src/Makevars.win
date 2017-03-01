@@ -1,0 +1,16 @@
+LIBSSH = ../windows/libssh-0.7.4
+
+PKG_CPPFLAGS = -DLIBSSH_STATIC \
+	-I${LIBSSH}/include
+
+PKG_LIBS = \
+	-L${LIBSSH}/lib${R_ARCH} \
+	-lssh -lcrypto -lz -lws2_32 -lgdi32 -lcrypt32
+
+all: clean winlibs
+
+clean:
+	rm -f $(OBJECTS) $(SHLIB)
+
+winlibs:
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" --vanilla "../tools/winlibs.R"
