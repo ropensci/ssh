@@ -1,12 +1,11 @@
 Package: tunnel
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Create SSH tunnel
+Version: 0.1
+Author: Jeroen Ooms
+Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
+Description: Bindings to libssh for creating a tunnel and maybe other stuff later.
+License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
+SystemRequirements: libssh (the original, not libssh2)
 RoxygenNote: 6.0.1
