@@ -1,0 +1,7 @@
+#PKG_CFLAGS="-I/usr/local/opt/libssh/include"
+PKG_LIBS=-lssh
+
+all: clean
+
+clean:
+	rm -Rf $(SHLIB) $(OBJECTS)
