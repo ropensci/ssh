@@ -5,7 +5,8 @@
 \alias{me}
 \title{SSH tunnel}
 \usage{
-blocking_tunnel(host = "dev.opencpu.org", port = 22, user = me())
+blocking_tunnel(host = "dev.opencpu.org", port = 22, user = me(),
+  passwd = askpass)
 
 me()
 }
@@ -15,6 +16,8 @@ me()
 \item{port}{a number}
 
 \item{user}{the username to authenticate with}
+
+\item{passwd}{string or callback function to supply password}
 }
 \description{
 Create an SSH tunnel

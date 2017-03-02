@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define make_string(x) x ? Rf_mkString(x) : ScalarString(NA_STRING)
+
 void bail_if(int rc, const char * what, ssh_session ssh){
   if (rc != SSH_OK){
     const char * err = ssh_get_error(ssh);
@@ -12,9 +14,60 @@ void bail_if(int rc, const char * what, ssh_session ssh){
   }
 }
 
+size_t password_cb(SEXP rpass, const char * prompt, char buf[1024]){
+  if(Rf_isString(rpass) && Rf_length(rpass)){
+    strncpy(buf, CHAR(STRING_ELT(rpass, 0)), 1024);
+    return Rf_length(STRING_ELT(rpass, 0));
+  } else if(Rf_isFunction(rpass)){
+    int err;
+    SEXP call = PROTECT(LCONS(rpass, LCONS(make_string(prompt), R_NilValue)));
+    SEXP res = PROTECT(R_tryEval(call, R_GlobalEnv, &err));
+    if(err || !isString(res)){
+      UNPROTECT(2);
+      error("Password callback did not return a string value");
+    }
+    strncpy(buf, CHAR(STRING_ELT(res, 0)), 1024);
+    UNPROTECT(2);
+    return strlen(buf);
+  }
+  Rf_errorcall(R_NilValue, "unsupported password type");
+}
+
+int auth_password(ssh_session ssh, SEXP rpass){
+  char buf[1024];
+  password_cb(rpass, "Please enter your password", buf);
+  int rc = ssh_userauth_password(ssh, NULL, buf);
+  bail_if(rc == SSH_AUTH_ERROR, "password auth", ssh);
+  return rc;
+}
+
+int auth_interactive(ssh_session ssh, SEXP rpass){
+  int rc = ssh_userauth_kbdint(ssh, NULL, NULL);
+  while (rc == SSH_AUTH_INFO) {
+    const char * name = ssh_userauth_kbdint_getname(ssh);
+    const char * instruction = ssh_userauth_kbdint_getinstruction(ssh);
+    int nprompts = ssh_userauth_kbdint_getnprompts(ssh);
+    if (strlen(name) > 0)
+      Rprintf("%s\n", name);
+    if (strlen(instruction) > 0)
+      Rprintf("%s\n", instruction);
+    for (int iprompt = 0; iprompt < nprompts; iprompt++) {
+      char buf[1024];
+      const char * prompt = ssh_userauth_kbdint_getprompt(ssh, iprompt, NULL);
+      password_cb(rpass, prompt, buf);
+      if (ssh_userauth_kbdint_setanswer(ssh, iprompt, buf) < 0)
+        return SSH_AUTH_ERROR;
+    }
+    rc = ssh_userauth_kbdint(ssh, NULL, NULL);
+  }
+  return rc;
+}
+
 int test_forwarding(ssh_session ssh);
 
-SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser){
+
+
+SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
   int port = asInteger(rport);
   int verbosity = SSH_LOG_PROTOCOL;
   const char * host = CHAR(STRING_ELT(rhost, 0));
@@ -40,13 +93,16 @@ SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser){
   /* authenticate client */
   if(ssh_userauth_none(ssh, NULL) != SSH_AUTH_SUCCESS){
     int method = ssh_userauth_list(ssh, NULL);
-    if (method & SSH_AUTH_METHOD_PUBLICKEY){
-      bail_if(ssh_userauth_publickey_auto(ssh, NULL, NULL) != SSH_AUTH_SUCCESS, "public key authentication", ssh);
-    } else {
-      Rf_error("No suitable authentication method implemented");
+    if (method & SSH_AUTH_METHOD_PUBLICKEY && ssh_userauth_publickey_auto(ssh, NULL, NULL) == SSH_AUTH_SUCCESS){
+      Rprintf("pubkey auth success!");
+    } else if (method & SSH_AUTH_METHOD_INTERACTIVE && auth_interactive(ssh, rpass) == SSH_AUTH_SUCCESS) {
+      Rprintf("interactive auth success!");
+    } else if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass) == SSH_AUTH_SUCCESS) {
+      Rprintf("password auth success!");
+    }  else {
+      Rf_error("Authentication failed, permission denied");
     }
   }
-
 
   /* display welcome message */
   char * banner = ssh_get_issue_banner(ssh);
@@ -89,3 +145,4 @@ int test_forwarding(ssh_session ssh){
   ssh_channel_free(tunnel);
   return SSH_OK;
 }
+
