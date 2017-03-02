@@ -41,8 +41,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     # Revert to Sept 16, 2016, last day of homebrew support for OSX 10.9 Mavericks
     curl -fsSL https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C $BREWDIR
     HOMEBREW_CACHE="$TMPDIR" $BREWDIR/bin/brew install --force-bottle makedepend openssl libssh --force-bottle 2>&1 | perl -pe 's/Warning/Note/gi'
-    rm -f $BREWDIR/Cellar/$PKG_BREW_NAME/*/lib/*.dylib
-    rm -f $BREWDIR/opt/$PKG_BREW_NAME/lib/*.dylib
+    rm -f $BREWDIR/Cellar/*/*/lib/*.dylib
+    rm -f $BREWDIR/opt/*/lib/*.dylib
     PKG_LIBS="-lssh -lcrypto -lz"
   fi
   PKG_CFLAGS="-I$BREWDIR/opt/libssh/include"
