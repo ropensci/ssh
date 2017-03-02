@@ -2,8 +2,11 @@
 #include <libssh/libssh.h>
 #include <string.h>
 #include <stdlib.h>
+#include <poll.h>
 
+int open_port(int port);
 #define make_string(x) x ? Rf_mkString(x) : ScalarString(NA_STRING)
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 void bail_if(int rc, const char * what, ssh_session ssh){
   if (rc != SSH_OK){
@@ -63,9 +66,35 @@ int auth_interactive(ssh_session ssh, SEXP rpass){
   return rc;
 }
 
-int test_forwarding(ssh_session ssh);
+void tunnel_port(ssh_session ssh, int port, const char * outhost, int outport){
+  ssh_channel tunnel = ssh_channel_new(ssh);
+  bail_if(tunnel == NULL, "ssh_channel_new", ssh);
+  bail_if(ssh_channel_open_forward(tunnel, outhost, outport, "localhost", port), "channel_open_forward", ssh);
 
-
+  //open server
+  int waitms = 200;
+  int connfd = open_port(port);
+  if(connfd > 0){
+    struct pollfd ufds = {connfd, POLLIN, POLLIN};
+    char buf[1024];
+    while(1){
+      R_CheckUserInterrupt();
+      int avail = 0;
+      while((avail = poll(&ufds, 1, waitms)) > 0){
+        size_t outsize = read(connfd, buf, MIN(avail, sizeof(buf)));
+        ssh_channel_write(tunnel, buf, outsize);
+      }
+      while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0){
+        write(connfd, buf, avail);
+      }
+      if(ssh_channel_is_closed(tunnel) || ssh_channel_is_eof(tunnel)) break;
+    }
+    close(connfd);
+  }
+  ssh_channel_send_eof(tunnel);
+  ssh_channel_close(tunnel);
+  ssh_channel_free(tunnel);
+}
 
 SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
   int port = asInteger(rport);
@@ -112,37 +141,10 @@ SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
   }
 
   /* TODO: do stuff */
-  test_forwarding(ssh);
+  tunnel_port(ssh, 5555, "www.httpbin.org", 80);
 
   /* cleanups */
   ssh_disconnect(ssh);
   ssh_free(ssh);
   return R_NilValue;
 }
-
-int test_forwarding(ssh_session ssh){
-  char * http_get = "GET /get HTTP/1.1\nHost: www.httpbin.org\n\n";
-  int nbytes, nwritten;
-  ssh_channel tunnel = ssh_channel_new(ssh);
-  bail_if(tunnel == NULL, "ssh_channel_new", ssh);
-  bail_if(ssh_channel_open_forward(tunnel, "www.httpbin.org", 80, "localhost", 5555),
-          "channel_open_forward", ssh);
-  nbytes = strlen(http_get);
-  nwritten = ssh_channel_write(tunnel, http_get, nbytes);
-  if (nbytes != nwritten) {
-    Rf_error("Failure on ssh_channel_write");
-  }
-  char dest[1000];
-  int len = 0;
-  while(1){
-    len = ssh_channel_read_timeout(tunnel, dest, 1000, FALSE, 1000);
-    if(len <= 0 || ssh_channel_is_eof(tunnel) || ssh_channel_is_closed(tunnel))
-      break;
-    Rprintf("%.*s", len, dest);
-  }
-  ssh_channel_send_eof(tunnel);
-  ssh_channel_close(tunnel);
-  ssh_channel_free(tunnel);
-  return SSH_OK;
-}
-
