@@ -2,6 +2,8 @@
 
 language: r
 cache: packages
+sudo: required
+dist: trusty
 
 matrix:
   include:
@@ -14,7 +16,6 @@ matrix:
       env: R_CODECOV=true
     - os: osx
       osx_image: xcode8.1
-      brew_packages: libssh
       latex: false
     - os: osx
       osx_image: xcode6.4

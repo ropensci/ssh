@@ -33,17 +33,20 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   if [ $(command -v brew) ]; then
     BREWDIR=$(brew --prefix)
   else
-    echo "Auto-brewing $PKG_BREW_NAME..."
     BREWDIR=$TMPDIR/homebrew
+    echo "Auto-brewing $PKG_BREW_NAME..."
     rm -Rf $BREWDIR
     mkdir -p $BREWDIR
+
+    # Revert to Sept 16, 2016, last day of homebrew support for OSX 10.9 Mavericks
     curl -fsSL https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C $BREWDIR
-    HOMEBREW_CACHE="/tmp" $BREWDIR/bin/brew install $PKG_BREW_NAME 2>&1 | sed 's/Warning/Note/g'
-    rm -f $BREWDIR/Cellar/$PKG_BREW_NAME/*/lib/*.dylib
-    rm -f $BREWDIR/opt/$PKG_BREW_NAME/lib/*.dylib
+    HOMEBREW_CACHE="$TMPDIR" $BREWDIR/bin/brew install --force-bottle makedepend openssl libssh --force-bottle 2>&1 | perl -pe 's/Warning/Note/gi'
+    rm -f $BREWDIR/Cellar/*/*/lib/*.dylib
+    rm -f $BREWDIR/opt/*/lib/*.dylib
+    PKG_LIBS="-lssh -lcrypto -lz"
   fi
-  PKG_CFLAGS="-I$BREWDIR/opt/$PKG_BREW_NAME/include"
-  PKG_LIBS="-L$BREWDIR/opt/$PKG_BREW_NAME/lib -lssh -lcrypto"
+  PKG_CFLAGS="-I$BREWDIR/opt/libssh/include"
+  PKG_LIBS="-L$BREWDIR/opt/libssh/lib -L$BREWDIR/opt/openssl/lib $PKG_LIBS"
 fi
 
 # For debugging
