@@ -3,7 +3,6 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
-#include <poll.h>
 #include <errno.h>
 
 /* Check for interrupt without long jumping */
@@ -21,6 +20,25 @@ void bail_for(int err, const char * what){
     Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, strerror(errno));
 }
 
+/* Wait for descriptor */
+int wait_for_fd(int fd){
+  int waitms = 200;
+  struct timeval tv;
+  tv.tv_sec = 0;
+  tv.tv_usec = waitms * 1000;
+  fd_set rfds;
+  int active = 0;
+  while(active == 0){
+    FD_ZERO(&rfds);
+    FD_SET(fd, &rfds);
+    active = select(fd+1, &rfds, NULL, NULL, &tv);
+    bail_for(active < 0, "select()");
+    if(active || pending_interrupt())
+      break;
+  }
+  return active;
+}
+
 int open_port(int port){
 
   // define server socket
@@ -31,25 +49,14 @@ int open_port(int port){
   serv_addr.sin_port = htons(port);
 
   //creates the listening socket
-  int reuse = 1;
   int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-  setsockopt(listenfd, SOL_SOCKET,SO_REUSEADDR, &reuse, sizeof(reuse));
   bail_for(listenfd < 0, "socket()");
   bail_for(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0, "bind()");
   bail_for(listen(listenfd, 10) < 0, "listen()");
 
   //each accept() ye a new incoming connection
   Rprintf("Waiting for connetion on port %d...\n", port);
-
-  //TODO: should poll() instead of block
-  int waitms = 500;
-  struct pollfd ufds = {listenfd, POLLIN, POLLIN};
-  while(!poll(&ufds, 1, waitms)){
-    if(pending_interrupt()){
-      close(listenfd);
-      return -1;
-    }
-  }
+  wait_for_fd(listenfd);
   int connfd = accept(listenfd, NULL, NULL);
   bail_for(connfd < 0, "accept()");
   Rprintf("Incoming connection!\n");
