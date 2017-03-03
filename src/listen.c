@@ -91,6 +91,6 @@ int open_port(int port){
 
   //do not allow additional client connetions
   close(listenfd);
-  //set_nonblocking(connfd);
+  set_nonblocking(connfd);
   return connfd;
 }
