@@ -25,7 +25,7 @@ void set_nonblocking(int sockfd){
   ioctlsocket(sockfd, FIONBIO, &nonblocking);
 }
 #else
-#define NONBLOCK_OK (errno == EINPROGRESS)
+#define NONBLOCK_OK (errno == EAGAIN || errno == EWOULDBLOCK)
 void set_nonblocking(int sockfd){
   long arg = fcntl(sockfd, F_GETFL, NULL);
   arg |= O_NONBLOCK;

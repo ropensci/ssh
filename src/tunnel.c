@@ -101,7 +101,7 @@ void tunnel_port(ssh_session ssh, int port, const char * outhost, int outport){
       int avail = 1;
       while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0)
         ssh_channel_write(tunnel, buf, avail);
-      bail_for(avail == -1, "read()");
+      bail_for(avail == -1, "recv()");
       while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0)
         write(connfd, buf, avail);
       bail_for(avail == -1, "ssh_channel_read_timeout()");
