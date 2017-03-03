@@ -159,7 +159,7 @@ SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
   }
 
   /* TODO: do stuff */
-  tunnel_port(ssh, 5555, "www.httpbin.org", 80);
+  tunnel_port(ssh, 5555, "ds043942.mongolab.com", 43942);
 
   /* cleanups */
   ssh_disconnect(ssh);
