@@ -22,6 +22,7 @@
 
 int open_port(int port);
 int pending_interrupt();
+void bail_for(int err, const char * what);
 
 #define make_string(x) x ? Rf_mkString(x) : Rf_ScalarString(NA_STRING)
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -100,8 +101,10 @@ void tunnel_port(ssh_session ssh, int port, const char * outhost, int outport){
       int avail = 1;
       while((avail = read(connfd, buf, sizeof(buf))) > 0)
         ssh_channel_write(tunnel, buf, avail);
+      bail_for(avail == -1, "read()");
       while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0)
         write(connfd, buf, avail);
+      bail_for(avail == -1, "ssh_channel_read_timeout()");
       if(ssh_channel_is_closed(tunnel) || ssh_channel_is_eof(tunnel)) break;
     }
     close(connfd);

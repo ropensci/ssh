@@ -44,7 +44,7 @@ int pending_interrupt() {
 
 /* check for system errors */
 void bail_for(int err, const char * what){
-  if(err)
+  if(err && !NONBLOCK_OK)
     Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, strerror(errno));
 }
 
@@ -91,6 +91,6 @@ int open_port(int port){
 
   //do not allow additional client connetions
   close(listenfd);
-  set_nonblocking(connfd);
+  //set_nonblocking(connfd);
   return connfd;
 }
