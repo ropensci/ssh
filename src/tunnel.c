@@ -1,12 +1,29 @@
+#define R_NO_REMAP
+#define STRICT_R_HEADERS
 #include <Rinternals.h>
-#include <libssh/libssh.h>
-#include <string.h>
 #include <stdlib.h>
-#include <poll.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#endif
+
+#include <libssh/libssh.h>
 
 int open_port(int port);
-#define make_string(x) x ? Rf_mkString(x) : ScalarString(NA_STRING)
+#define make_string(x) x ? Rf_mkString(x) : Rf_ScalarString(NA_STRING)
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 
 void bail_if(int rc, const char * what, ssh_session ssh){
   if (rc != SSH_OK){
@@ -23,11 +40,11 @@ size_t password_cb(SEXP rpass, const char * prompt, char buf[1024]){
     return Rf_length(STRING_ELT(rpass, 0));
   } else if(Rf_isFunction(rpass)){
     int err;
-    SEXP call = PROTECT(LCONS(rpass, LCONS(make_string(prompt), R_NilValue)));
+    SEXP call = PROTECT(Rf_lcons(rpass, Rf_lcons(make_string(prompt), R_NilValue)));
     SEXP res = PROTECT(R_tryEval(call, R_GlobalEnv, &err));
-    if(err || !isString(res)){
+    if(err || !Rf_isString(res)){
       UNPROTECT(2);
-      error("Password callback did not return a string value");
+      Rf_error("Password callback did not return a string value");
     }
     strncpy(buf, CHAR(STRING_ELT(res, 0)), 1024);
     UNPROTECT(2);
@@ -75,7 +92,6 @@ void tunnel_port(ssh_session ssh, int port, const char * outhost, int outport){
   int waitms = 200;
   int connfd = open_port(port);
   if(connfd > 0){
-    struct pollfd ufds = {connfd, POLLIN, POLLIN};
     char buf[1024];
     while(1){
       R_CheckUserInterrupt();
@@ -97,7 +113,7 @@ void tunnel_port(ssh_session ssh, int port, const char * outhost, int outport){
 }
 
 SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
-  int port = asInteger(rport);
+  int port = Rf_asInteger(rport);
   int verbosity = SSH_LOG_PROTOCOL;
   const char * host = CHAR(STRING_ELT(rhost, 0));
   const char * user = CHAR(STRING_ELT(ruser, 0));

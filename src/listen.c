@@ -1,9 +1,37 @@
+#define R_NO_REMAP
+#define STRICT_R_HEADERS
 #include <Rinternals.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#else
+#include <sys/select.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#endif
+
+#ifdef _WIN32
+#define NONBLOCK_OK (WSAGetLastError() == WSAEWOULDBLOCK)
+void set_nonblocking(int sockfd){
+  u_long nonblocking = 1;
+  ioctlsocket(sockfd, FIONBIO, &nonblocking);
+}
+#else
+#define NONBLOCK_OK (errno == EINPROGRESS)
+void set_nonblocking(int sockfd){
+  long arg = fcntl(sockfd, F_GETFL, NULL);
+  arg |= O_NONBLOCK;
+  fcntl(sockfd, F_SETFL, arg);
+}
+#endif
 
 /* Check for interrupt without long jumping */
 void check_interrupt_fn(void *dummy) {
@@ -63,5 +91,6 @@ int open_port(int port){
 
   //do not allow additional client connetions
   close(listenfd);
+  set_nonblocking(connfd);
   return connfd;
 }
