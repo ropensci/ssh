@@ -114,7 +114,7 @@ void tunnel_port(ssh_session ssh, int port, const char * outhost, int outport){
   ssh_channel_free(tunnel);
 }
 
-SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
+SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP thost, SEXP tport, SEXP lport, SEXP rpass){
   int port = Rf_asInteger(rport);
   int verbosity = SSH_LOG_PROTOCOL;
   const char * host = CHAR(STRING_ELT(rhost, 0));
@@ -158,8 +158,8 @@ SEXP C_blocking_tunnel(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
     free(banner);
   }
 
-  /* TODO: do stuff */
-  tunnel_port(ssh, 5555, "ds043942.mongolab.com", 43942);
+  /* Set up tunnel to the target host */
+  tunnel_port(ssh, Rf_asInteger(lport), CHAR(STRING_ELT(thost, 0)), Rf_asInteger(tport));
 
   /* cleanups */
   ssh_disconnect(ssh);
