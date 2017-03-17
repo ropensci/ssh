@@ -11,6 +11,7 @@ PKG_DEB_NAME="libssh-dev"
 PKG_RPM_NAME="libssh-devel"
 PKG_BREW_NAME="libssh"
 PKG_TEST_HEADER="<libssh/libssh.h>"
+PKG_LIBS_STATIC="-lssh -lcrypto -lz"
 PKG_LIBS="-lssh"
 PKG_CFLAGS=""
 
@@ -33,9 +34,8 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   if [ $(command -v brew) ]; then
     BREWDIR=$(brew --prefix)
   else
-    curl -OL https://jeroen.github.io/autobrew/libssh.sh
-    source libssh.sh
-    PKG_LIBS="-lssh -lcrypto -lz"
+    curl -sOL https://jeroen.github.io/autobrew/libssh
+    source libssh
   fi
   PKG_CFLAGS="-I$BREWDIR/opt/libssh/include"
   PKG_LIBS="-L$BREWDIR/opt/libssh/lib -L$BREWDIR/opt/openssl/lib $PKG_LIBS"
