@@ -1,18 +1,14 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
 language: r
 cache: packages
-dist: trusty
 latex: false
-fortran:false
+fortran: false
 
 matrix:
   include:
     - os: linux
-      r: release
-    - os: linux
-      r: devel
+      dist: trusty
       env: R_CODECOV=true
+      r_check_args: '--use-valgrind'
     - os: osx
       osx_image: xcode9.2
     - os: osx
