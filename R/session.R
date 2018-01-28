@@ -1,21 +1,12 @@
-#' SSH tunnel
-#'
-#' Create an SSH tunnel
-#'
 #' @export
 #' @rdname ssh
-#' @useDynLib ssh C_blocking_tunnel
-#' @param ssh an ssh server string of the form `[user@]hostname[:@port]`
-#' @param target target sever string of the form `hostname[:port]`
-#' @param listen port on which to listen for incoming connections
-#' @param passwd string or callback function to supply ssh password
-tunnel <- function(ssh = "dev.opencpu.org:22", target = "ds043942.mongolab.com:43942", listen = 5555, passwd = askpass) {
-  stopifnot(is.character(ssh))
-  stopifnot(is.character(target))
+#' @useDynLib ssh C_start_session
+#' @param host an ssh server string of the form `[user@]hostname[:@port]`
+ssh <- function(host = "dev.opencpu.org:22", passwd = askpass) {
+  stopifnot(is.character(host))
   stopifnot(is.character(passwd) || is.function(passwd))
-  ssh <- parse_host(ssh, default_port = 22)
-  target <- parse_host(target)
-  .Call(C_blocking_tunnel, ssh$host, ssh$port, ssh$user, target$host, target$port, listen, passwd)
+  details <- parse_host(host, default_port = 22)
+  .Call(C_start_session, details$host, details$port, details$user, passwd)
 }
 
 parse_host <- function(str, default_port){

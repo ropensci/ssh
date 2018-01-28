@@ -1,11 +1,11 @@
-Package: tunnel
+Package: ssh
 Type: Package
-Title: Create SSH tunnel
+Title: Secure Shell (SSH) Client for R
 Version: 0.1
 Author: Jeroen Ooms
 Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
-Description: Bindings to libssh for creating a tunnel and maybe other stuff later.
+Description: Bindings to libssh for connecting to an SSH server.
 License: MIT + file LICENSE
 Encoding: UTF-8
 SystemRequirements: libssh (the original, not libssh2)
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
