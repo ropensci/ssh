@@ -125,6 +125,14 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &verbosity), "set verbosity", ssh);
 
+  /* sets password callback for default private key */
+  struct ssh_callbacks_struct cb = {
+    .userdata = rpass,
+    .auth_function = my_auth_callback
+  };
+  ssh_callbacks_init(&cb);
+  ssh_set_callbacks(ssh, &cb);
+
   /* connect */
   bail_if(ssh_connect(ssh), "connect", ssh);
 

@@ -3,6 +3,7 @@
 
 #include <Rinternals.h>
 #include <libssh/libssh.h>
+#include <libssh/callbacks.h>
 #include <stdlib.h>
 #include <string.h>
 
