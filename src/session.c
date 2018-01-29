@@ -90,7 +90,7 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_HOST, host), "set host", ssh);
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_USER, user), "set user", ssh);
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
-  bail_if(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &verbosity), "set verbosity", ssh);
+  //bail_if(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &verbosity), "set verbosity", ssh);
 
   /* connect */
   bail_if(ssh_connect(ssh), "connect", ssh);
