@@ -116,14 +116,12 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
 
   /* load options */
   int port = Rf_asInteger(rport);
-  int verbosity = SSH_LOG_PROTOCOL;
   const char * host = CHAR(STRING_ELT(rhost, 0));
   const char * user = CHAR(STRING_ELT(ruser, 0));
   ssh_session ssh = ssh_new();
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_HOST, host), "set host", ssh);
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_USER, user), "set user", ssh);
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
-  bail_if(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &verbosity), "set verbosity", ssh);
 
   /* sets password callback for default private key */
   struct ssh_callbacks_struct cb = {
