@@ -5,17 +5,14 @@
 #' @export
 #' @rdname ssh
 #' @useDynLib ssh C_blocking_tunnel
-#' @param ssh an ssh server string of the form `[user@]hostname[:@port]`
-#' @param target target sever string of the form `hostname[:port]`
-#' @param listen port on which to listen for incoming connections
-#' @param passwd string or callback function to supply ssh password
-tunnel <- function(ssh = "dev.opencpu.org:22", target = "ds043942.mongolab.com:43942", listen = 5555, passwd = askpass) {
-  stopifnot(is.character(ssh))
-  stopifnot(is.character(target))
-  stopifnot(is.character(passwd) || is.function(passwd))
-  ssh <- parse_host(ssh, default_port = 22)
+#' @param session existing ssh connnection created with [ssh]
+#' @param port integer of local port on which to listen for incoming connections
+#' @param target string with target host and port to connnect to via ssh tunnel
+tunnel <- function(session = ssh(), port = 5555, target = "ds043942.mongolab.com:43942") {
+  assert_session(session)
+  stopifnot(is.numeric(port))
   target <- parse_host(target)
-  .Call(C_blocking_tunnel, ssh$host, ssh$port, ssh$user, target$host, target$port, listen, passwd)
+  .Call(C_blocking_tunnel, session, as.integer(port), target$host, target$port)
 }
 
 parse_host <- function(str, default_port){
@@ -53,4 +50,9 @@ me <- function(){
 askpass <- function(prompt = "Please enter your password: "){
   FUN <- getOption("askpass", readline)
   FUN(prompt)
+}
+
+assert_session <- function(x){
+  if(!inherits(x, "ssh_session"))
+    stop('Argument "session" must be an ssh session', call. = FALSE)
 }

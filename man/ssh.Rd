@@ -7,19 +7,19 @@
 \usage{
 ssh(host = "dev.opencpu.org:22", passwd = askpass)
 
-tunnel(ssh = "dev.opencpu.org:22", target = "ds043942.mongolab.com:43942",
-  listen = 5555, passwd = askpass)
+tunnel(session = ssh(), port = 5555,
+  target = "ds043942.mongolab.com:43942")
 }
 \arguments{
-\item{host}{an ssh server string of the form `[user@]hostname[:@port]`}
+\item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
 
-\item{passwd}{string or callback function to supply ssh password}
+\item{passwd}{either a string or a callback function for password prompt}
 
-\item{ssh}{an ssh server string of the form `[user@]hostname[:@port]`}
+\item{session}{existing ssh connnection created with \link{ssh}}
 
-\item{target}{target sever string of the form `hostname[:port]`}
+\item{port}{integer of local port on which to listen for incoming connections}
 
-\item{listen}{port on which to listen for incoming connections}
+\item{target}{string with target host and port to connnect to via ssh tunnel}
 }
 \description{
 Create an SSH tunnel

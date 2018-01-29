@@ -2,6 +2,7 @@
 #' @rdname ssh
 #' @useDynLib ssh C_start_session
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
+#' @param passwd either a string or a callback function for password prompt
 ssh <- function(host = "dev.opencpu.org:22", passwd = askpass) {
   stopifnot(is.character(host))
   stopifnot(is.character(passwd) || is.function(passwd))

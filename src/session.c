@@ -1,15 +1,14 @@
-#define R_NO_REMAP
-#define STRICT_R_HEADERS
+#include "myssh.h"
 
-#include <Rinternals.h>
-#include <libssh/libssh.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define make_string(x) x ? Rf_mkString(x) : Rf_ScalarString(NA_STRING)
+ssh_session ssh_ptr_get(SEXP ptr){
+  ssh_session ssh = (ssh_session) R_ExternalPtrAddr(ptr);
+  if(ssh == NULL)
+    Rf_error("SSH session pointer is dead");
+  return ssh;
+}
 
 static void ssh_ptr_fin(SEXP ptr){
-  ssh_session ssh = (ssh_session) R_ExternalPtrAddr(ptr);
+  ssh_session ssh = ssh_ptr_get(ptr);
   ssh_disconnect(ssh);
   ssh_free(ssh);
   R_ClearExternalPtr(ptr);
@@ -23,7 +22,7 @@ static SEXP ssh_ptr_create(ssh_session ssh){
   return ptr;
 }
 
-static void bail_if(int rc, const char * what, ssh_session ssh){
+void bail_if(int rc, const char * what, ssh_session ssh){
   if (rc != SSH_OK){
     char buf[1024];
     strncpy(buf, ssh_get_error(ssh), 1024);
