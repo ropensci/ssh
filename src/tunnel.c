@@ -96,7 +96,6 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0)
       syserror_if(send(connfd, buf, avail, 0) < avail, "send() to user");
     syserror_if(avail == -1, "ssh_channel_read_timeout()");
-    syserror_if(fcntl(connfd, F_GETFD) == -1, "client connection broken");
 
   }
   Rprintf("closing connfd\n");
