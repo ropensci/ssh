@@ -8,7 +8,7 @@
 \usage{
 exec(session = ssh(), command = "whoami")
 
-ssh(host = "dev.opencpu.org:22", passwd = askpass)
+ssh(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass)
 
 tunnel(session = ssh(), port = 5555,
   target = "ds043942.mongolab.com:43942")
@@ -19,6 +19,8 @@ tunnel(session = ssh(), port = 5555,
 \item{command}{The command to execute (e.g. \code{ls ~/ -al | grep -i reports}).}
 
 \item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
+
+\item{keyfile}{path to private key. If \code{NULL} the default user key is tried.}
 
 \item{passwd}{either a string or a callback function for password prompt}
 

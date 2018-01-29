@@ -3,11 +3,14 @@
 #' @useDynLib ssh C_start_session
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
-ssh <- function(host = "dev.opencpu.org:22", passwd = askpass) {
+#' @param keyfile path to private key. If `NULL` the default user key is tried.
+ssh <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass) {
   stopifnot(is.character(host))
   stopifnot(is.character(passwd) || is.function(passwd))
   details <- parse_host(host, default_port = 22)
-  .Call(C_start_session, details$host, details$port, details$user, passwd)
+  if(length(keyfile))
+    keyfile <- normalizePath(keyfile, mustWork = TRUE)
+  .Call(C_start_session, details$host, details$port, details$user, keyfile, passwd)
 }
 
 parse_host <- function(str, default_port){

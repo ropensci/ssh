@@ -81,7 +81,33 @@ static int auth_interactive(ssh_session ssh, SEXP rpass){
   return rc;
 }
 
-SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
+/* authenticate client */
+static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass){
+  if(ssh_userauth_none(ssh, NULL) == SSH_AUTH_SUCCESS)
+    return;
+  int method = ssh_userauth_list(ssh, NULL);
+  if (method & SSH_AUTH_METHOD_PUBLICKEY){
+    if(privkey != NULL && ssh_userauth_publickey(ssh, NULL, privkey) == SSH_AUTH_SUCCESS)
+      return;
+    if(privkey == NULL && ssh_userauth_publickey_auto(ssh, NULL, NULL) == SSH_AUTH_SUCCESS)
+      return;
+  }
+  if (method & SSH_AUTH_METHOD_INTERACTIVE && auth_interactive(ssh, rpass) == SSH_AUTH_SUCCESS)
+    return;
+  if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass) == SSH_AUTH_SUCCESS)
+    return;
+  Rf_error("Authentication failed, permission denied");
+}
+
+SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpass){
+
+  /* try reading private key first */
+  ssh_key privkey = NULL;
+  if(Rf_length(keyfile))
+    if(ssh_pki_import_privkey_file(CHAR(STRING_ELT(keyfile, 0)), NULL, NULL, NULL, &privkey) != SSH_OK)
+      Rf_error("Failed to read private key: %s", CHAR(STRING_ELT(keyfile, 0)));
+
+  /* load options */
   int port = Rf_asInteger(rport);
   int verbosity = SSH_LOG_PROTOCOL;
   const char * host = CHAR(STRING_ELT(rhost, 0));
@@ -90,7 +116,7 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_HOST, host), "set host", ssh);
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_USER, user), "set user", ssh);
   bail_if(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
-  //bail_if(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &verbosity), "set verbosity", ssh);
+  bail_if(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &verbosity), "set verbosity", ssh);
 
   /* connect */
   bail_if(ssh_connect(ssh), "connect", ssh);
@@ -104,19 +130,8 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP rpass){
   int state = ssh_is_server_known(ssh);
   Rprintf("%s server SHA1: %s\n", state ? "known" : "unknown", ssh_get_hexa(hash, hlen));
 
-  /* authenticate client */
-  if(ssh_userauth_none(ssh, NULL) != SSH_AUTH_SUCCESS){
-    int method = ssh_userauth_list(ssh, NULL);
-    if (method & SSH_AUTH_METHOD_PUBLICKEY && ssh_userauth_publickey_auto(ssh, NULL, NULL) == SSH_AUTH_SUCCESS){
-      Rprintf("pubkey auth success!");
-    } else if (method & SSH_AUTH_METHOD_INTERACTIVE && auth_interactive(ssh, rpass) == SSH_AUTH_SUCCESS) {
-      Rprintf("interactive auth success!");
-    } else if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass) == SSH_AUTH_SUCCESS) {
-      Rprintf("password auth success!");
-    }  else {
-      Rf_error("Authentication failed, permission denied");
-    }
-  }
+  /* Authenticate client */
+  auth_any(ssh, privkey, rpass);
 
   /* display welcome message */
   char * banner = ssh_get_issue_banner(ssh);
