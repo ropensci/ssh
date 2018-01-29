@@ -93,6 +93,8 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0)
       ssh_channel_write(tunnel, buf, avail);
     syserror_if(avail == -1, "recv() from user");
+    if(avail == 0)
+      break;
     while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0)
       syserror_if(send(connfd, buf, avail, 0) < avail, "send() to user");
     syserror_if(avail == -1, "ssh_channel_read_timeout()");
