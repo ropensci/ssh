@@ -54,6 +54,7 @@ int wait_for_fd(int fd){
   fd_set rfds;
   int active = 0;
   while(active == 0){
+    Rprintf("?");
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
     active = select(fd+1, &rfds, NULL, NULL, &tv);
@@ -111,8 +112,10 @@ void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
   Rprintf("Waiting for connetion on port %d...\n", port);
 
   int listenfd = open_port(port);
+  Rprintf("Port %d is opened!\n", port);
   //while(!pending_interrupt()){
-    wait_for_fd(listenfd);
+    if(wait_for_fd(listenfd) == 0)
+      return;
     int connfd = accept(listenfd, NULL, NULL);
     syserror_if(connfd < 0, "accept()");
 
