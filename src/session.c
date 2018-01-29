@@ -51,6 +51,13 @@ static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024]){
   Rf_errorcall(R_NilValue, "unsupported password type");
 }
 
+int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int verify, void *userdata){
+  Rprintf("Calling my_auth_callback\n");
+  SEXP rpass = (SEXP) userdata;
+  password_cb(rpass, prompt, buf);
+  return SSH_OK;
+}
+
 static int auth_password(ssh_session ssh, SEXP rpass){
   char buf[1024];
   password_cb(rpass, "Please enter your password", buf);
@@ -104,7 +111,7 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   /* try reading private key first */
   ssh_key privkey = NULL;
   if(Rf_length(keyfile))
-    if(ssh_pki_import_privkey_file(CHAR(STRING_ELT(keyfile, 0)), NULL, NULL, NULL, &privkey) != SSH_OK)
+    if(ssh_pki_import_privkey_file(CHAR(STRING_ELT(keyfile, 0)), NULL, my_auth_callback, rpass, &privkey) != SSH_OK)
       Rf_error("Failed to read private key: %s", CHAR(STRING_ELT(keyfile, 0)));
 
   /* load options */
