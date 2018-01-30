@@ -45,8 +45,25 @@ void syserror_if(int err, const char * what){
     Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, strerror(errno));
 }
 
+char spinner(){
+  static int x;
+  x = (x + 1) % 4;
+  switch(x){
+  case 0: return '|';
+  case 1: return '/';
+  case 2: return '-';
+  case 3: return '\\';
+  }
+  return '?';
+}
+
+static int total;
+void print_progress(int add){
+  Rprintf("\r%c Tunneled %d bytes...", spinner(), total += add);
+}
+
 /* Wait for descriptor */
-int wait_for_fd(int fd){
+int wait_for_fd(int fd, int port){
   int waitms = 200;
   struct timeval tv;
   tv.tv_sec = 0;
@@ -54,7 +71,7 @@ int wait_for_fd(int fd){
   fd_set rfds;
   int active = 0;
   while(active == 0){
-    Rprintf("?");
+    Rprintf("\r%c Waiting for connetion on port %d... ", spinner(), port);
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
     active = select(fd+1, &rfds, NULL, NULL, &tv);
@@ -87,53 +104,43 @@ void host_tunnel(ssh_channel tunnel, int connfd){
   char buf[1024];
 
   //assume connfd is non-blocking
+  total = 0;
+  int avail = 1;
   while(!pending_interrupt() && ssh_channel_is_open(tunnel) && !ssh_channel_is_eof(tunnel)){
-    Rprintf(".");
-    int avail = 1;
-    while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0)
+    while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0){
       ssh_channel_write(tunnel, buf, avail);
+      print_progress(avail);
+    }
     syserror_if(avail == -1, "recv() from user");
     if(avail == 0)
       break;
-    while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0)
+    while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0){
       syserror_if(send(connfd, buf, avail, 0) < avail, "send() to user");
+      print_progress(avail);
+    }
     syserror_if(avail == -1, "ssh_channel_read_timeout()");
-
+    print_progress(0);
   }
-  Rprintf("closing connfd\n");
   close(connfd);
-  Rprintf("closing channel...");
   ssh_channel_send_eof(tunnel);
   ssh_channel_close(tunnel);
   ssh_channel_free(tunnel);
-  Rprintf("done!\n");
-
-  //TODO: suicide fork
 }
 
 void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
-  Rprintf("Waiting for connetion on port %d...\n", port);
-
   int listenfd = open_port(port);
-  Rprintf("Port %d is opened!\n", port);
-  //while(!pending_interrupt()){
-    if(wait_for_fd(listenfd) == 0)
-      return;
-    int connfd = accept(listenfd, NULL, NULL);
-    syserror_if(connfd < 0, "accept()");
-
-    Rprintf("Incoming connection!\n");
-    set_nonblocking(connfd);
-    ssh_channel tunnel = ssh_channel_new(ssh);
-    bail_if(tunnel == NULL, "ssh_channel_new", ssh);
-    bail_if(ssh_channel_open_forward(tunnel, outhost, outport, "localhost", port), "channel_open_forward", ssh);
-
-    //TODO fork here
-    host_tunnel(tunnel, connfd);
-  //}
-  Rprintf("closing listenfd...");
+  if(wait_for_fd(listenfd, port) == 0)
+    return;
+  int connfd = accept(listenfd, NULL, NULL);
+  syserror_if(connfd < 0, "accept()");
+  Rprintf("client connnected!\n");
+  set_nonblocking(connfd);
+  ssh_channel tunnel = ssh_channel_new(ssh);
+  bail_if(tunnel == NULL, "ssh_channel_new", ssh);
+  bail_if(ssh_channel_open_forward(tunnel, outhost, outport, "localhost", port), "channel_open_forward", ssh);
+  host_tunnel(tunnel, connfd);
+  Rprintf("tunnel closed!\n");
   close(listenfd);
-  Rprintf("done!\n");
 }
 
 /* Set up tunnel to the target host */

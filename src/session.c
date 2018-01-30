@@ -140,8 +140,8 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   size_t hlen = 0;
   ssh_get_publickey(ssh, &key);
   ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen);
-  int state = ssh_is_server_known(ssh);
-  Rprintf("%s server SHA1: %s\n", state ? "known" : "unknown", ssh_get_hexa(hash, hlen));
+  if(!ssh_is_server_known(ssh))
+    Rprintf("Unknown server fingerprint: %s\n", ssh_get_hexa(hash, hlen));
 
   /* Authenticate client */
   auth_any(ssh, privkey, rpass);

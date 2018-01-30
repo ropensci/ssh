@@ -13,6 +13,7 @@ tunnel <- function(session = ssh(), port = 5555, target = "ds043942.mongolab.com
   stopifnot(is.numeric(port))
   target <- parse_host(target)
   .Call(C_blocking_tunnel, session, as.integer(port), target$host, target$port)
+  invisible()
 }
 
 parse_host <- function(str, default_port){
