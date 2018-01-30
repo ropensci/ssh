@@ -18,6 +18,7 @@ addons:
   apt:
     packages:
     - libssh-dev
+    - libapparmor-dev
 
 after_success:
   - if [[ "${R_CODECOV}" ]]; then R -e 'covr::codecov()'; fi
