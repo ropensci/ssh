@@ -6,7 +6,8 @@
 \alias{tunnel}
 \title{SSH tunnel}
 \usage{
-exec(session = ssh(), command = "whoami")
+exec(session = ssh(), command = "whoami", std_out = stdout(),
+  std_err = stderr())
 
 ssh(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass)
 
@@ -17,6 +18,10 @@ tunnel(session = ssh(), port = 5555,
 \item{session}{existing ssh connnection created with \link{ssh}}
 
 \item{command}{The command to execute (e.g. \code{ls ~/ -al | grep -i reports}).}
+
+\item{std_out}{callback function or connection to handle stdout stream from host}
+
+\item{std_err}{callback function or connection to handle stderr stream from host}
 
 \item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
 

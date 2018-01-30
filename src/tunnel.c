@@ -100,8 +100,8 @@ int open_port(int port){
 }
 
 void host_tunnel(ssh_channel tunnel, int connfd){
-  int waitms = 200;
-  char buf[1024];
+  int waitms = 50;
+  char buf[65536];
 
   //assume connfd is non-blocking
   total = 0;
