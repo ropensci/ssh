@@ -32,6 +32,8 @@ SEXP C_ssh_exec(SEXP ptr, SEXP command, SEXP outfun, SEXP errfun){
   }
   //this blocks until command has completed
   status = ssh_channel_get_exit_status(channel);
+
+  //jump directly to here for interruptions
 cleanup:
   ssh_channel_close(channel);
   ssh_channel_free(channel);
