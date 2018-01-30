@@ -10,3 +10,5 @@
 #define make_string(x) x ? Rf_mkString(x) : Rf_ScalarString(NA_STRING)
 ssh_session ssh_ptr_get(SEXP ptr);
 void bail_if(int rc, const char * what, ssh_session ssh);
+int pending_interrupt();
+

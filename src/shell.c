@@ -20,9 +20,12 @@ SEXP C_ssh_exec(SEXP ptr, SEXP command, SEXP outfun, SEXP errfun){
 
   static char buffer[1024];
   int nbytes;
-  for(int stream = 0; stream < 2; stream++){
-    while ((nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), stream)) > 0)
-      R_callback(stream > 0 ? errfun : outfun, buffer, nbytes);
+  while(!pending_interrupt() && ssh_channel_is_open(channel) && !ssh_channel_is_eof(channel)){
+    for(int stream = 0; stream < 2; stream++){
+      while ((nbytes = ssh_channel_read_nonblocking(channel, buffer, sizeof(buffer), stream)) > 0)
+        R_callback(stream ? errfun : outfun, buffer, nbytes);
+      bail_if(nbytes == SSH_ERROR, "ssh_channel_read_nonblocking", ssh);
+    }
   }
   int status = ssh_channel_get_exit_status(channel);
   ssh_channel_close(channel);
