@@ -1,10 +1,21 @@
+#' SSH Client
+#'
+#' Create an ssh session using `ssh_connect()`. Then use the other functions to
+#' run commands or create a tunnel via this ssh session.
+#'
 #' @export
 #' @rdname ssh
 #' @useDynLib ssh C_start_session
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
 #' @param keyfile path to private key. If `NULL` the default user key is tried.
-ssh <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass) {
+#' @examples \dontrun{
+#' ssh_exec(command = c(
+#'   'wget https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+#'   'R CMD check jsonlite_1.5.tar.gz',
+#'   'rm -f jsonlite_1.5.tar.gz'
+#' ))}
+ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass) {
   stopifnot(is.character(host))
   stopifnot(is.character(passwd) || is.function(passwd))
   details <- parse_host(host, default_port = 22)

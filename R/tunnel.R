@@ -1,14 +1,11 @@
-#' SSH tunnel
-#'
-#' Create an SSH tunnel
-#'
 #' @export
 #' @rdname ssh
+#' @name ssh
 #' @useDynLib ssh C_blocking_tunnel
 #' @param session existing ssh connnection created with [ssh]
 #' @param port integer of local port on which to listen for incoming connections
 #' @param target string with target host and port to connnect to via ssh tunnel
-tunnel <- function(session = ssh(), port = 5555, target = "ds043942.mongolab.com:43942") {
+ssh_tunnel <- function(session = ssh_connect(), port = 5555, target = "ds043942.mongolab.com:43942") {
   assert_session(session)
   stopifnot(is.numeric(port))
   target <- parse_host(target)

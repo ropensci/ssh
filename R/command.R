@@ -4,9 +4,10 @@
 #' @param command The command to execute (e.g. `ls ~/ -al | grep -i reports`).
 #' @param std_out callback function or connection to handle stdout stream from host
 #' @param std_err callback function or connection to handle stderr stream from host
-exec <- function(session = ssh(), command = "whoami", std_out = stdout(), std_err = stderr()) {
+ssh_exec <- function(session = ssh_connect(), command = "whoami", std_out = stdout(), std_err = stderr()) {
   assert_session(session)
   stopifnot(is.character(command))
+  command <- paste(command, collapse = "\n")
   outfun <- if(inherits(std_out, "connection")){
     if(!isOpen(std_out)){
       open(std_out, "wb")
