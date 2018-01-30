@@ -4,11 +4,12 @@
 #' run commands or create a tunnel via this ssh session.
 #'
 #' @export
-#' @rdname ssh
 #' @useDynLib ssh C_start_session
+#' @aliases ssh
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
 #' @param keyfile path to private key. If `NULL` the default user key is tried.
+#' @family ssh
 #' @examples \dontrun{
 #' ssh_exec(command = c(
 #'   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',

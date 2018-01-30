@@ -1,8 +1,17 @@
+#' Create SSH tunnel
+#'
+#' Opens a port on your machine and tunnel all traffic to a custom target host via the
+#' SSH server.
+#'
+#' This is a blocking function so you can not use R while the tunnel is active. You need
+#' to connect to the tunnel (by default `localhost:5555`) from a separate process. The tunnel
+#' can only be used once and will automatically be closed when the client disconnects.
+#'
 #' @export
-#' @rdname ssh
-#' @name ssh
+#' @rdname ssh_tunnel
+#' @family ssh
 #' @useDynLib ssh C_blocking_tunnel
-#' @param session existing ssh connnection created with [ssh]
+#' @param session ssh connnection created with [ssh_connect()]
 #' @param port integer of local port on which to listen for incoming connections
 #' @param target string with target host and port to connnect to via ssh tunnel
 ssh_tunnel <- function(session = ssh_connect(), port = 5555, target = "ds043942.mongolab.com:43942") {

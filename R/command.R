@@ -1,10 +1,26 @@
+#' Execute Remote Command
+#'
+#' Run a command or script on the host while streaming stdout and stderr directly
+#' to the client.
+#'
+#' The [ssh_exec_wait()] function is the remote equivalent of the local [sys::exec_wait()].
+#' It runs a command or script on the ssh server and streams stdout and stderr to the client
+#' to a file or connection. When done it returns the exit status for the remotely executed command.
+#'
+#' Similarly [ssh_exec_internal()] is a small wrapper analogous to [sys::exec_internal()].
+#' It buffers all stdout and stderr output into a raw vector and returns it in a list along with
+#' the exit status. By default this function raises an error if the remote command was unsuccessful.
+#'
 #' @export
-#' @rdname ssh
+#' @rdname ssh_exec
+#' @name ssh_exec
+#' @family ssh
 #' @useDynLib ssh C_ssh_exec
-#' @param command The command to execute (e.g. `ls ~/ -al | grep -i reports`).
+#' @inheritParams ssh_tunnel
+#' @param command The command or script to execute
 #' @param std_out callback function, filename, or connection object to handle stdout stream
 #' @param std_err callback function, filename, or connection object to handle stderr stream
-ssh_exec <- function(session = ssh_connect(), command = "whoami", std_out = stdout(), std_err = stderr()) {
+ssh_exec_wait <- function(session = ssh_connect(), command = "whoami", std_out = stdout(), std_err = stderr()) {
   assert_session(session)
   stopifnot(is.character(command))
   command <- paste(command, collapse = "\n")
@@ -60,4 +76,22 @@ ssh_exec <- function(session = ssh_connect(), command = "whoami", std_out = stdo
   if(is.na(status))
     return(invisible())
   status
+}
+
+
+#' @export
+#' @param error automatically raise an error if the exit status is non-zero
+#' @rdname ssh_exec
+#' @useDynLib ssh C_ssh_exec
+ssh_exec_internal <- function(session = ssh_connect(), command = "whoami", error = TRUE){
+  outcon <- rawConnection(raw(0), "r+")
+  on.exit(close(outcon), add = TRUE)
+  errcon <- rawConnection(raw(0), "r+")
+  on.exit(close(errcon), add = TRUE)
+  status <- ssh_exec_wait(session, command, std_out = outcon, std_err = errcon)
+  if (isTRUE(error) && !identical(status, 0L))
+    stop(sprintf("Executing '%s' failed with status %d",
+                 command, status))
+  list(status = status, stdout = rawConnectionValue(outcon),
+       stderr = rawConnectionValue(errcon))
 }

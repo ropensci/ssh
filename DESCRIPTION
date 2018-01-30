@@ -10,3 +10,4 @@ Encoding: UTF-8
 SystemRequirements: libssh (the original, not libssh2)
 RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE)
+Suggests: sys
