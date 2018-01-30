@@ -11,7 +11,7 @@
 #' @param keyfile path to private key. If `NULL` the default user key is tried.
 #' @examples \dontrun{
 #' ssh_exec(command = c(
-#'   'wget https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+#'   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
 #'   'R CMD check jsonlite_1.5.tar.gz',
 #'   'rm -f jsonlite_1.5.tar.gz'
 #' ))}

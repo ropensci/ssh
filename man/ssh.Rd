@@ -41,7 +41,7 @@ run commands or create a tunnel via this ssh session.
 \examples{
 \dontrun{
 ssh_exec(command = c(
-  'wget https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+  'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
   'R CMD check jsonlite_1.5.tar.gz',
   'rm -f jsonlite_1.5.tar.gz'
 ))}

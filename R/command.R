@@ -42,5 +42,8 @@ ssh_exec <- function(session = ssh_connect(), command = "whoami", std_out = stdo
       }
     }
   }
-  .Call(C_ssh_exec, session, command, outfun, errfun)
+  status <- .Call(C_ssh_exec, session, command, outfun, errfun)
+  if(is.na(out))
+    return(invisible())
+  status
 }
