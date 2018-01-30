@@ -20,9 +20,9 @@ ssh_tunnel(session = ssh_connect(), port = 5555,
 
 \item{command}{The command to execute (e.g. \code{ls ~/ -al | grep -i reports}).}
 
-\item{std_out}{callback function or connection to handle stdout stream from host}
+\item{std_out}{callback function, filename, or connection object to handle stdout stream}
 
-\item{std_err}{callback function or connection to handle stderr stream from host}
+\item{std_err}{callback function, filename, or connection object to handle stderr stream}
 
 \item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
 
