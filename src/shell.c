@@ -18,16 +18,21 @@ SEXP C_ssh_exec(SEXP ptr, SEXP command, SEXP outfun, SEXP errfun){
   bail_if(ssh_channel_open_session(channel), "ssh_channel_open_session", ssh);
   bail_if(ssh_channel_request_exec(channel, CHAR(STRING_ELT(command, 0))), "ssh_channel_request_exec", ssh);
 
-  static char buffer[1024];
   int nbytes;
-  while(!pending_interrupt() && ssh_channel_is_open(channel) && !ssh_channel_is_eof(channel)){
+  int status = NA_INTEGER;
+  static char buffer[1024];
+  while(ssh_channel_is_open(channel) && !ssh_channel_is_eof(channel)){
+    if(pending_interrupt())
+      goto cleanup;
     for(int stream = 0; stream < 2; stream++){
       while ((nbytes = ssh_channel_read_nonblocking(channel, buffer, sizeof(buffer), stream)) > 0)
         R_callback(stream ? errfun : outfun, buffer, nbytes);
       bail_if(nbytes == SSH_ERROR, "ssh_channel_read_nonblocking", ssh);
     }
   }
-  int status = ssh_channel_get_exit_status(channel);
+  //this blocks until command has completed
+  status = ssh_channel_get_exit_status(channel);
+cleanup:
   ssh_channel_close(channel);
   ssh_channel_free(channel);
   return Rf_ScalarInteger(status);
