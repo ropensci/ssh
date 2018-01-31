@@ -41,10 +41,13 @@ SEXP C_scp_write_file(SEXP ptr, SEXP path, SEXP data){
   ssh_session ssh = ssh_ptr_get(ptr);
   ssh_scp scp = ssh_scp_new(ssh, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, ".");
   bail_if(ssh_scp_init(scp), "ssh_scp_init", ssh);
-  char * cpath = (char*) CHAR(STRING_ELT(path, 0));
-  if(strcmp(cpath, basename(cpath)))
+  char cpath[4000];
+  char filename[4000];
+  strncpy(cpath, CHAR(STRING_ELT(path, 0)), 4000);
+  strncpy(filename, basename(cpath), 4000);
+  if(strcmp(cpath, filename))
     enter_directory(scp, dirname(cpath), ssh);
-  bail_if(ssh_scp_push_file(scp, basename(cpath), Rf_length(data), 420L), "ssh_scp_push_file", ssh);
+  bail_if(ssh_scp_push_file(scp, filename, Rf_length(data), 420L), "ssh_scp_push_file", ssh);
   bail_if(ssh_scp_write(scp, RAW(data), Rf_length(data)), "ssh_scp_write", ssh);
   ssh_scp_close(scp);
   ssh_scp_free(scp);
