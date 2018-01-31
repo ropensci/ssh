@@ -3,14 +3,19 @@
 \name{scp}
 \alias{scp}
 \alias{scp_read_file}
+\alias{scp_write_file}
 \title{Upload / Download via SCP}
 \usage{
 scp_read_file(session = ssh_connect(), path)
+
+scp_write_file(session = ssh_connect(), path, data)
 }
 \arguments{
 \item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 
 \item{path}{path to the file on the server}
+
+\item{data}{string or raw vector with data to write to the file}
 }
 \description{
 Upload and download files and directories to/from the SSH server.

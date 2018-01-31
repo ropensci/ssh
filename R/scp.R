@@ -13,3 +13,16 @@ scp_read_file <- function(session = ssh_connect(), path){
   stopifnot(is.character(path))
   .Call(C_scp_read_file, session, path)
 }
+
+#' @rdname scp
+#' @export
+#' @useDynLib ssh C_scp_write_file
+#' @param data string or raw vector with data to write to the file
+scp_write_file <- function(session = ssh_connect(), path, data){
+  assert_session(session)
+  stopifnot(is.character(path))
+  if(is.character(data))
+    data <- charToRaw(data)
+  stopifnot(is.raw(data))
+  .Call(C_scp_write_file, session, path, data)
+}
