@@ -65,7 +65,7 @@ parse_host <- function(str, default_port){
 }
 
 me <- function(){
-  Sys.info()[["user"]]
+  tolower(Sys.info()[["user"]])
 }
 
 askpass <- function(prompt = "Please enter your password: "){
