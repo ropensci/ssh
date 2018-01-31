@@ -3,15 +3,26 @@
 #' Create an ssh session using `ssh_connect()`. Then use the other functions to
 #' run commands or create a tunnel via this ssh session.
 #'
+#' The client first tries to authenticate using a private key, if available. When
+#' this fails it tries challenge-response (interactive) and password auth. The
+#' `passwd` parameter can be used to provide a passphrase or a callback function to
+#' ask prompt the user for the passphrase when needed.
+#'
+#' __Windows users:__ the private key must be in OpenSSH PEM format. If you open it in
+#' a text editor it must start with something like `-----BEGIN RSA PRIVATE KEY-----`.
+#' To use your Putty PKK key, open it in the *PuttyGen* utility and go to
+#' *Conversions->Export OpenSSH*.
+#'
 #' @export
 #' @useDynLib ssh C_start_session
 #' @aliases ssh
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
-#' @param keyfile path to private key. If `NULL` the default user key is tried.
+#' @param keyfile path to private key file. Must be in OpenSSH format (putty PKK files
+#' won't work). If `NULL` the default user key (e.g `~/.ssh/id_rsa`) is tried.
 #' @family ssh
 #' @examples \dontrun{
-#' ssh_exec(command = c(
+#' ssh_exec_wait(command = c(
 #'   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
 #'   'R CMD check jsonlite_1.5.tar.gz',
 #'   'rm -f jsonlite_1.5.tar.gz'

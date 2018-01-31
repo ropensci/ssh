@@ -10,7 +10,8 @@ ssh_connect(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass)
 \arguments{
 \item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
 
-\item{keyfile}{path to private key. If \code{NULL} the default user key is tried.}
+\item{keyfile}{path to private key file. Must be in OpenSSH format (putty PKK files
+won't work). If \code{NULL} the default user key (e.g \code{~/.ssh/id_rsa}) is tried.}
 
 \item{passwd}{either a string or a callback function for password prompt}
 }
@@ -18,9 +19,20 @@ ssh_connect(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass)
 Create an ssh session using \code{ssh_connect()}. Then use the other functions to
 run commands or create a tunnel via this ssh session.
 }
+\details{
+The client first tries to authenticate using a private key, if available. When
+this fails it tries challenge-response (interactive) and password auth. The
+\code{passwd} parameter can be used to provide a passphrase or a callback function to
+ask prompt the user for the passphrase when needed.
+
+\strong{Windows users:} the private key must be in OpenSSH PEM format. If you open it in
+a text editor it must start with something like \code{-----BEGIN RSA PRIVATE KEY-----}.
+To use your Putty PKK key, open it in the \emph{PuttyGen} utility and go to
+\emph{Conversions->Export OpenSSH}.
+}
 \examples{
 \dontrun{
-ssh_exec(command = c(
+ssh_exec_wait(command = c(
   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
   'R CMD check jsonlite_1.5.tar.gz',
   'rm -f jsonlite_1.5.tar.gz'
