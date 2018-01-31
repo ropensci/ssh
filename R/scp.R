@@ -22,7 +22,7 @@ scp_write_file <- function(session = ssh_connect(), path, data){
   assert_session(session)
   stopifnot(is.character(path))
   if(is.character(data))
-    data <- charToRaw(data)
+    data <- charToRaw(paste(data, collapse = "\n"))
   stopifnot(is.raw(data))
   .Call(C_scp_write_file, session, path, data)
 }
