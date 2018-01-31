@@ -3,9 +3,9 @@
 #' Opens a port on your machine and tunnel all traffic to a custom target host via the
 #' SSH server.
 #'
-#' This is a blocking function so you can not use R while the tunnel is active. You need
-#' to connect to the tunnel (by default `localhost:5555`) from a separate process. The tunnel
-#' can only be used once and will automatically be closed when the client disconnects.
+#' This function blocks while the tunnel is active. Use the tunnel by connecting to
+#' `localhost:5555` from a separate process. The tunnel can only be used once and will
+#' automatically be closed when the client disconnects.
 #'
 #' @export
 #' @rdname ssh_tunnel

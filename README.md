@@ -88,5 +88,5 @@ Opens a port on your machine and tunnel all traffic to a custom target host via 
 ssh_tunnel(session, port = 5555,target = "ds043942.mongolab.com:43942")
 ```
 
-This is a blocking function so you can not use R while the tunnel is active. You need to connect to the tunnel (by default `localhost:5555`) from a separate process. The tunnel can only be used once and will automatically be closed when the client disconnects.
+This function blocks while the tunnel is active. Use the tunnel by connecting to `localhost:5555` from a separate process. The tunnel can only be used once and will automatically be closed when the client disconnects.
 
