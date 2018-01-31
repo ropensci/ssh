@@ -29,7 +29,7 @@ SEXP C_scp_read_file(SEXP ptr, SEXP path){
  */
 
 
-void enter_directory(ssh_scp scp, char * path, ssh_session ssh){
+static void enter_directory(ssh_scp scp, char * path, ssh_session ssh){
   char subdir[4000];
   strncpy(subdir, basename(path), 4000);
   if(strcmp(path, basename(path)))
