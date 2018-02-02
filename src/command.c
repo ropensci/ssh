@@ -21,7 +21,10 @@ SEXP C_ssh_exec(SEXP ptr, SEXP command, SEXP outfun, SEXP errfun){
   int nbytes;
   int status = NA_INTEGER;
   static char buffer[1024];
+  struct timeval tv = {0, 100000}; //100ms
   while(ssh_channel_is_open(channel) && !ssh_channel_is_eof(channel)){
+    ssh_channel readchans[2] = {channel, 0};
+    ssh_channel_select(readchans, NULL, NULL, &tv);
     if(pending_interrupt())
       goto cleanup;
     for(int stream = 0; stream < 2; stream++){
