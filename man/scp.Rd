@@ -3,10 +3,14 @@
 \name{scp}
 \alias{scp}
 \alias{scp_read_file}
+\alias{scp_read_recursive}
 \alias{scp_write_file}
 \title{Upload / Download via SCP}
 \usage{
 scp_read_file(session = ssh_connect(), path)
+
+scp_read_recursive(session = ssh_connect(), path, to = ".",
+  verbose = TRUE)
 
 scp_write_file(session = ssh_connect(), path, data)
 }
@@ -14,6 +18,11 @@ scp_write_file(session = ssh_connect(), path, data)
 \item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 
 \item{path}{path to the file on the server}
+
+\item{to}{either a path to a local directory or a callback function to handle
+downloaded files. Default copies everything to current working directory.}
+
+\item{verbose}{print file paths and sizes while copying}
 
 \item{data}{string or raw vector with data to write to the file}
 }
