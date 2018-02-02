@@ -11,6 +11,7 @@ void log_cb(int priority, const char *function, const char *buffer, void *userda
 void R_init_ssh(DllInfo* info) {
   R_registerRoutines(info, NULL, NULL, NULL, NULL);
   R_useDynamicSymbols(info, TRUE);
+  ssh_init();
   ssh_set_log_callback(log_cb);
   //ssh_set_log_level(SSH_OPTIONS_LOG_VERBOSITY);
 }
