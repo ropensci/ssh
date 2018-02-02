@@ -100,13 +100,19 @@ int open_port(int port){
 }
 
 void host_tunnel(ssh_channel tunnel, int connfd){
-  int waitms = 10;
-  char buf[65536];
+  char buf[16384];
 
   //assume connfd is non-blocking
   total = 0;
   int avail = 1;
+  fd_set rfds;
+  struct timeval tv = {0, 100000}; //100ms
   while(!pending_interrupt() && ssh_channel_is_open(tunnel) && !ssh_channel_is_eof(tunnel)){
+    FD_ZERO(&rfds);
+    FD_SET(connfd, &rfds);
+    ssh_channel channels[2] = {tunnel, 0};
+    ssh_channel out[2];
+    ssh_select(channels, out, connfd+1, &rfds, &tv);
     while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0){
       ssh_channel_write(tunnel, buf, avail);
       print_progress(avail);
@@ -114,7 +120,7 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     syserror_if(avail == -1, "recv() from user");
     if(avail == 0)
       break;
-    while((avail = ssh_channel_read_timeout(tunnel, buf, sizeof(buf), FALSE, waitms)) > 0){
+    while((avail = ssh_channel_read_nonblocking(tunnel, buf, sizeof(buf), 0)) > 0){
       syserror_if(send(connfd, buf, avail, 0) < avail, "send() to user");
       print_progress(avail);
     }
