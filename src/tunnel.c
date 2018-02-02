@@ -113,6 +113,8 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     ssh_channel channels[2] = {tunnel, 0};
     ssh_channel out[2];
     ssh_select(channels, out, connfd+1, &rfds, &tv);
+
+    /* Pipe local socket data to ssh channel */
     while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0){
       ssh_channel_write(tunnel, buf, avail);
       print_progress(avail);
@@ -120,11 +122,18 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     syserror_if(avail == -1, "recv() from user");
     if(avail == 0)
       break;
+
+    /* Pipe ssh stdout data to local socket */
     while((avail = ssh_channel_read_nonblocking(tunnel, buf, sizeof(buf), 0)) > 0){
       syserror_if(send(connfd, buf, avail, 0) < avail, "send() to user");
       print_progress(avail);
     }
-    syserror_if(avail == -1, "ssh_channel_read_timeout()");
+    syserror_if(avail == -1, "ssh_channel_read_nonblocking()");
+
+    /* Print ssh stderr data to console (not sure if this is needed) */
+    while((avail = ssh_channel_read_nonblocking(tunnel, buf, sizeof(buf), 1)) > 0)
+      REprintf("%.*s", avail, buf);
+    syserror_if(avail == -1, "ssh_channel_read_nonblocking()");
     print_progress(0);
   }
   close(connfd);
