@@ -8,7 +8,7 @@ SEXP C_scp_read_file(SEXP ptr, SEXP path){
   ssh_session ssh = ssh_ptr_get(ptr);
   ssh_scp scp = ssh_scp_new(ssh, SSH_SCP_READ, CHAR(STRING_ELT(path, 0)));
   bail_if(ssh_scp_init(scp), "ssh_scp_init", ssh);
-  bail_if(ssh_scp_pull_request(scp) != SSH_SCP_REQUEST_NEWFILE, "ssh_scp_pull_request", ssh);
+  bail_if(ssh_scp_pull_request(scp) != SSH_SCP_REQUEST_NEWFILE, "SSH_SCP_REQUEST_NEWFILE", ssh);
 
   /* get file info */
   R_xlen_t size = ssh_scp_request_get_size64(scp);
@@ -16,6 +16,7 @@ SEXP C_scp_read_file(SEXP ptr, SEXP path){
   bail_if(ssh_scp_accept_request(scp), "ssh_scp_accept_request", ssh);
   if(ssh_scp_read(scp, RAW(out), size) != size)
     Rf_error("Read bytes did not match filesize");
+  bail_if(ssh_scp_pull_request(scp) != SSH_SCP_REQUEST_EOF, "SSH_SCP_REQUEST_EOF", ssh);
   ssh_scp_close(scp);
   ssh_scp_free(scp);
   return out;
