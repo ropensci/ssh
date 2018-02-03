@@ -86,25 +86,25 @@ SEXP C_scp_download_recursive(SEXP ptr, SEXP path, SEXP cb){
   bail_if(ssh_scp_init(scp), "ssh_scp_init", ssh);
   int status = SSH_OK;
   int depth = 0;
-  char * dirvec[1000];
+  char * pwd[1000];
   while(!pending_interrupt()){
     switch((status = ssh_scp_pull_request(scp))){
     case SSH_SCP_REQUEST_NEWFILE:
       bail_if(ssh_scp_accept_request(scp), "ssh_scp_accept_request", ssh);
-      dirvec[depth] = strdup(ssh_scp_request_get_filename(scp));
+      pwd[depth] = strdup(ssh_scp_request_get_filename(scp));
       SEXP data = PROTECT(stream_to_r(scp));
-      SEXP dir = PROTECT(dirvec_to_r(dirvec, depth + 1));
+      SEXP dir = PROTECT(dirvec_to_r(pwd, depth + 1));
       SEXP call = PROTECT(Rf_lcons(cb, Rf_lcons(data, Rf_lcons(dir, R_NilValue))));
       Rf_eval(call, R_GlobalEnv);
       UNPROTECT(3);
-      free(dirvec[depth]);
+      free(pwd[depth]);
       break;
     case SSH_SCP_REQUEST_NEWDIR:
       ssh_scp_accept_request(scp);
-      dirvec[depth++] = strdup(ssh_scp_request_get_filename(scp));
+      pwd[depth++] = strdup(ssh_scp_request_get_filename(scp));
       break;
     case SSH_SCP_REQUEST_ENDDIR:
-      free(dirvec[--depth] = NULL);
+      free(pwd[--depth]);
       break;
     case SSH_SCP_REQUEST_WARNING:
       REprintf("SSH warning: %s\n",ssh_scp_request_get_warning(scp));
@@ -123,4 +123,56 @@ cleanup:
   ssh_scp_close(scp);
   ssh_scp_free(scp);
   return R_NilValue;
+}
+
+SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
+  ssh_session ssh = ssh_ptr_get(ptr);
+  ssh_scp scp = ssh_scp_new(ssh, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, CHAR(STRING_ELT(to, 0)));
+  bail_if(ssh_scp_init(scp), "ssh_scp_init", ssh);
+  int depth = 0;
+  char * pwd[1000];
+  for(int i = 0; i < Rf_length(files); i++){
+    //calculate common path (find first non common subdir)
+    SEXP filevec = VECTOR_ELT(files, i);
+    for(int j = 0; j < fmin(Rf_length(filevec), depth); j++){
+      if(strcmp(pwd[j], CHAR(STRING_ELT(filevec, j)))){
+        //cd up to here
+        while(depth > j){
+          Rprintf("cd ..\n");
+          ssh_scp_leave_directory(scp);
+          free(pwd[--depth]);
+        }
+        break;
+      }
+    }
+
+    //enter to subdir (not basename)
+    for(int j = depth; j < Rf_length(filevec) - 1; j++){
+      Rprintf("cd %s\n", CHAR(STRING_ELT(filevec, j)));
+      pwd[depth++] = strdup(CHAR(STRING_ELT(filevec, j)));
+      bail_if(ssh_scp_push_directory(scp, CHAR(STRING_ELT(filevec, j)), 493L), "ssh_scp_push_directory", ssh);
+    }
+
+    //copy file
+    SEXP call = PROTECT(Rf_lcons(cb, Rf_lcons(filevec, R_NilValue)));
+    SEXP data = PROTECT(Rf_eval(call, R_GlobalEnv));
+    const char * filename = CHAR(STRING_ELT(filevec, Rf_length(filevec) - 1));
+    bail_if(ssh_scp_push_file(scp, filename, Rf_length(data), 420L), "ssh_scp_push_file", ssh);
+    bail_if(ssh_scp_write(scp, RAW(data), Rf_length(data)), "ssh_scp_write", ssh);
+    UNPROTECT(2);
+    Rprintf("created file %s\n", filename);
+    if(pending_interrupt())
+      break;
+  }
+
+  //exit cleanly
+  while(depth > 0){
+    Rprintf("cd ..\n");
+    ssh_scp_leave_directory(scp);
+    free(pwd[--depth]);
+  }
+
+  ssh_scp_close(scp);
+  ssh_scp_free(scp);
+  return to;
 }

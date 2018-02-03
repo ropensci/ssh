@@ -21,9 +21,10 @@ scp_read_file <- function(session = ssh_connect(), path){
 #' @param to either a path to a local directory or a callback function to handle
 #' downloaded files. Default copies everything to current working directory.
 #' @param verbose print file paths and sizes while copying
-scp_read_recursive <- function(session = ssh_connect(), path, to = ".", verbose = TRUE){
+#' @param from existing directory to copy from
+scp_read_recursive <- function(session = ssh_connect(), from, to = ".", verbose = TRUE){
   assert_session(session)
-  stopifnot(is.character(path))
+  stopifnot(is.character(from))
   cb <- if(is.function(to)){
     function(data, filepath){
       target <- do.call(file.path, as.list(filepath))
@@ -43,7 +44,7 @@ scp_read_recursive <- function(session = ssh_connect(), path, to = ".", verbose 
   } else {
     stop("Parameter 'to' must be a filepath or callback function")
   }
-  .Call(C_scp_download_recursive, session, path, cb)
+  .Call(C_scp_download_recursive, session, from, cb)
 }
 
 #' @rdname scp
@@ -57,4 +58,20 @@ scp_write_file <- function(session = ssh_connect(), path, data){
     data <- charToRaw(paste(data, collapse = "\n"))
   stopifnot(is.raw(data))
   .Call(C_scp_write_file, session, path, data)
+}
+
+
+#' @rdname scp
+#' @export
+#' @useDynLib ssh C_scp_write_recursive
+scp_write_recursive <- function(session = ssh_connect(), from, to = "."){
+  assert_session(session)
+  stopifnot(file.exists(from))
+  stopifnot(is.character(to))
+  files <- strsplit(list.files(from, recursive = TRUE, all.files = TRUE), "/")
+  cb <- function(filevec){
+    abspath <- do.call(file.path, as.list(c(from, filevec)))
+    readBin(abspath, raw(), file.info(abspath)$size)
+  }
+  .Call(C_scp_write_recursive, session, files, to, cb)
 }
