@@ -66,7 +66,8 @@ scp_write_file <- function(session = ssh_connect(), path, data){
 #' @useDynLib ssh C_scp_write_recursive
 scp_write_recursive <- function(session = ssh_connect(), from, to = ".", verbose = TRUE){
   assert_session(session)
-  stopifnot(file.exists(from))
+  if(!file.exists(from))
+    stop(sprintf("Directory not found: %s", from))
   stopifnot(is.character(to))
   files <- strsplit(list.files(from, recursive = TRUE, all.files = TRUE), "/")
   cb <- function(filevec){
