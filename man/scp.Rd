@@ -15,7 +15,8 @@ scp_read_recursive(session = ssh_connect(), from, to = ".",
 
 scp_write_file(session = ssh_connect(), path, data)
 
-scp_write_recursive(session = ssh_connect(), from, to = ".")
+scp_write_recursive(session = ssh_connect(), from, to = ".",
+  verbose = TRUE)
 }
 \arguments{
 \item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}

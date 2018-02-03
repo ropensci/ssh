@@ -129,6 +129,8 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
   ssh_session ssh = ssh_ptr_get(ptr);
   ssh_scp scp = ssh_scp_new(ssh, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, CHAR(STRING_ELT(to, 0)));
   bail_if(ssh_scp_init(scp), "ssh_scp_init", ssh);
+  if(ssh_scp_push_directory(scp, ".", 493L) != SSH_OK)
+    Rf_error("Invalid starting directory: %s\n", CHAR(STRING_ELT(to, 0)));
   int depth = 0;
   char * pwd[1000];
   for(int i = 0; i < Rf_length(files); i++){
@@ -138,7 +140,6 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
       if(strcmp(pwd[j], CHAR(STRING_ELT(filevec, j)))){
         //cd up to here
         while(depth > j){
-          Rprintf("cd ..\n");
           ssh_scp_leave_directory(scp);
           free(pwd[--depth]);
         }
@@ -148,7 +149,6 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
 
     //enter to subdir (not basename)
     for(int j = depth; j < Rf_length(filevec) - 1; j++){
-      Rprintf("cd %s\n", CHAR(STRING_ELT(filevec, j)));
       pwd[depth++] = strdup(CHAR(STRING_ELT(filevec, j)));
       bail_if(ssh_scp_push_directory(scp, CHAR(STRING_ELT(filevec, j)), 493L), "ssh_scp_push_directory", ssh);
     }
@@ -160,18 +160,14 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
     bail_if(ssh_scp_push_file(scp, filename, Rf_length(data), 420L), "ssh_scp_push_file", ssh);
     bail_if(ssh_scp_write(scp, RAW(data), Rf_length(data)), "ssh_scp_write", ssh);
     UNPROTECT(2);
-    Rprintf("created file %s\n", filename);
     if(pending_interrupt())
       break;
   }
 
-  //exit cleanly
   while(depth > 0){
-    Rprintf("cd ..\n");
     ssh_scp_leave_directory(scp);
     free(pwd[--depth]);
   }
-
   ssh_scp_close(scp);
   ssh_scp_free(scp);
   return to;

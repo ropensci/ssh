@@ -64,14 +64,18 @@ scp_write_file <- function(session = ssh_connect(), path, data){
 #' @rdname scp
 #' @export
 #' @useDynLib ssh C_scp_write_recursive
-scp_write_recursive <- function(session = ssh_connect(), from, to = "."){
+scp_write_recursive <- function(session = ssh_connect(), from, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(file.exists(from))
   stopifnot(is.character(to))
   files <- strsplit(list.files(from, recursive = TRUE, all.files = TRUE), "/")
   cb <- function(filevec){
-    abspath <- do.call(file.path, as.list(c(from, filevec)))
-    readBin(abspath, raw(), file.info(abspath)$size)
+    localpath <- do.call(file.path, as.list(c(from, filevec)))
+    target <- do.call(file.path, as.list(c(to, filevec)))
+    fsize <- file.info(localpath)$size
+    if(verbose)
+      cat(sprintf("%10d %s\n", fsize, target))
+    readBin(localpath, raw(), fsize)
   }
   .Call(C_scp_write_recursive, session, files, to, cb)
 }
