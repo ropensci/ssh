@@ -57,8 +57,10 @@ char spinner(){
   return '?';
 }
 
-static int total;
-void print_progress(int add){
+static void print_progress(int add){
+  static int total;
+  if(add < 0)
+    total = 0;
   Rprintf("\r%c Tunneled %d bytes...", spinner(), total += add);
 }
 
@@ -103,7 +105,6 @@ void host_tunnel(ssh_channel tunnel, int connfd){
   char buf[16384];
 
   //assume connfd is non-blocking
-  total = 0;
   int avail = 1;
   fd_set rfds;
   struct timeval tv = {0, 100000}; //100ms
@@ -115,6 +116,7 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     ssh_select(channels, out, connfd+1, &rfds, &tv);
 
     /* Pipe local socket data to ssh channel */
+    print_progress(-1);
     while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0){
       ssh_channel_write(tunnel, buf, avail);
       print_progress(avail);
@@ -134,7 +136,7 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     while((avail = ssh_channel_read_nonblocking(tunnel, buf, sizeof(buf), 1)) > 0)
       REprintf("%.*s", avail, buf);
     syserror_if(avail == -1, "ssh_channel_read_nonblocking()");
-    print_progress(0);
+    print_progress(0); //spinner only
   }
   close(connfd);
   ssh_channel_send_eof(tunnel);
