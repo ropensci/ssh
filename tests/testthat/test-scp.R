@@ -1,5 +1,7 @@
 context("scp")
 
+ssh <- ssh_connect()
+
 content <- function(x){
   unname(tools::md5sum(x))
 }
@@ -10,8 +12,21 @@ compare_dir <- function(ssh, source_dir){
   expect_equal(lst, list.files(source_dir))
 }
 
+test_that("Upload and download single files", {
+  tmp <- tempfile(fileext = '.csv')
+  svn <- R.home("SVN-REVISION")
+  write.csv(iris, tmp)
+  scp_upload(ssh, c(tmp, svn), verbose = FALSE)
+  scp_download(ssh, basename(tmp), verbose = FALSE)
+  scp_download(ssh, basename(svn), verbose = FALSE)
+  expect_equal(content(tmp), content(basename(tmp)))
+  expect_equal(content(svn), content(basename(svn)))
+  expect_equal(ssh_exec_internal(ssh, command = paste('rm -f', basename(tmp), basename(svn)))$status, 0)
+  unlink(basename(svn))
+  unlink(basename(tmp))
+})
+
 test_that("Upload and download a directory", {
-  ssh <- ssh_connect()
   expect_equal(ssh_exec_internal(ssh, command = "rm -Rf ~/testdir")$status, 0)
   source_dir <- 'testdir'
   scp_upload(ssh, files = source_dir, to = "~", verbose = FALSE)

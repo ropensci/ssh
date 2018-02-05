@@ -1,19 +1,7 @@
 #' Upload / Download via SCP
 #'
-#' Upload and download files and directories to/from the SSH server.
+#' Upload / download files and directories to/from the SSH server.
 #'
-#' @export
-#' @rdname scp
-#' @name scp
-#' @useDynLib ssh C_scp_read_file
-#' @inheritParams ssh_tunnel
-#' @param path path to the file on the server
-scp_read_file <- function(session = ssh_connect(), path){
-  assert_session(session)
-  stopifnot(is.character(path))
-  .Call(C_scp_read_file, session, path)
-}
-
 #' @export
 #' @rdname scp
 #' @name scp
@@ -23,7 +11,8 @@ scp_read_file <- function(session = ssh_connect(), path){
 #' downloaded files. Default copies everything into working directory for downloads,
 #' and home directory for uploads.
 #' @param verbose print file paths and sizes while copying
-#' @param files path to directory or file to upload or download.
+#' @param files path to directory or file to upload or download
+#' @inheritParams ssh_tunnel
 scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(is.character(files))
@@ -53,8 +42,38 @@ scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRU
 
 #' @rdname scp
 #' @export
+#' @useDynLib ssh C_scp_write_recursive
+scp_upload <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
+  assert_session(session)
+  stopifnot(is.character(files))
+  stopifnot(is.character(to))
+  info <- list_all(files)
+  .Call(C_scp_write_recursive, session, info$local, info$size, info$path, to, verbose)
+}
+
+list_all <- function(files, hidden = FALSE){
+  dfs <- lapply(files, function(path){
+    if(!file.exists(path))
+      stop(sprintf("File or directory does not exist: %s", path))
+    if(file.info(path)$isdir){
+      rel <- list.files(path, recursive = TRUE, all.files = hidden, include.dirs = TRUE)
+      abs <- file.path(path, rel)
+      target <- file.path(basename(normalizePath(path, mustWork = TRUE)), rel)
+    } else {
+      target <- basename(path)
+      abs <- path
+    }
+    data.frame(local = normalizePath(abs), target = target, stringsAsFactors = FALSE)
+  })
+  df <- do.call(rbind.data.frame, c(dfs, make.row.names = FALSE, stringsAsFactors = FALSE, deparse.level = 0))
+  df <- cbind(file.info(df$local), df)
+  path <- strsplit(df$target, "/")
+  path[df$isdir] <- lapply(path[df$isdir], append, NA_character_)
+  df$path = path
+  df
+}
+
 #' @useDynLib ssh C_scp_write_file
-#' @param data string or raw vector with data to write to the file
 scp_write_file <- function(session = ssh_connect(), path, data){
   assert_session(session)
   stopifnot(is.character(path))
@@ -64,24 +83,9 @@ scp_write_file <- function(session = ssh_connect(), path, data){
   .Call(C_scp_write_file, session, path, data)
 }
 
-
-#' @rdname scp
-#' @export
-#' @useDynLib ssh C_scp_write_recursive
-scp_upload <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
+#' @useDynLib ssh C_scp_read_file
+scp_read_file <- function(session = ssh_connect(), path){
   assert_session(session)
-  if(!file.exists(files))
-    stop(sprintf("Directory not found: %s", files))
-  stopifnot(is.character(to))
-  filelist <- strsplit(list.files(files, recursive = TRUE, all.files = TRUE), "/")
-  to <- file.path(to, basename(files))
-  cb <- function(filevec){
-    localpath <- do.call(file.path, as.list(c(files, filevec)))
-    target <- do.call(file.path, as.list(c(to, filevec)))
-    fsize <- file.info(localpath)$size
-    if(verbose)
-      cat(sprintf("%10d %s\n", fsize, target))
-    readBin(localpath, raw(), fsize)
-  }
-  .Call(C_scp_write_recursive, session, filelist, to, cb)
+  stopifnot(is.character(path))
+  .Call(C_scp_read_file, session, path)
 }

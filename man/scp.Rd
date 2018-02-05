@@ -2,26 +2,18 @@
 % Please edit documentation in R/scp.R
 \name{scp}
 \alias{scp}
-\alias{scp_read_file}
 \alias{scp_download}
-\alias{scp_write_file}
 \alias{scp_upload}
 \title{Upload / Download via SCP}
 \usage{
-scp_read_file(session = ssh_connect(), path)
-
 scp_download(session = ssh_connect(), files, to = ".", verbose = TRUE)
-
-scp_write_file(session = ssh_connect(), path, data)
 
 scp_upload(session = ssh_connect(), files, to = ".", verbose = TRUE)
 }
 \arguments{
 \item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 
-\item{path}{path to the file on the server}
-
-\item{files}{path to directory or file to upload or download.}
+\item{files}{path to directory or file to upload or download}
 
 \item{to}{path to an existing location on the local system (for download) or server
 system (for upload) where the target \code{files} will be copied into.
@@ -29,9 +21,7 @@ downloaded files. Default copies everything into working directory for downloads
 and home directory for uploads.}
 
 \item{verbose}{print file paths and sizes while copying}
-
-\item{data}{string or raw vector with data to write to the file}
 }
 \description{
-Upload and download files and directories to/from the SSH server.
+Upload / download files and directories to/from the SSH server.
 }

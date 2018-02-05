@@ -11,4 +11,3 @@
 ssh_session ssh_ptr_get(SEXP ptr);
 void bail_if(int rc, const char * what, ssh_session ssh);
 int pending_interrupt();
-

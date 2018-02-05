@@ -117,7 +117,7 @@ cleanup:
   return R_NilValue;
 }
 
-SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
+SEXP C_scp_write_recursive(SEXP ptr, SEXP sources, SEXP sizes, SEXP paths, SEXP to, SEXP verbose){
   ssh_session ssh = ssh_ptr_get(ptr);
   ssh_scp scp = ssh_scp_new(ssh, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, CHAR(STRING_ELT(to, 0)));
   bail_if(ssh_scp_init(scp), "ssh_scp_init", ssh);
@@ -125,9 +125,14 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
     Rf_errorcall(R_NilValue, "Failed to create: %s (no such directory?)\n", CHAR(STRING_ELT(to, 0)));
   int depth = 0;
   char * pwd[1000];
-  for(int i = 0; i < Rf_length(files); i++){
+  for(int i = 0; i < Rf_length(paths); i++){
+
+    // check for SIGINT
+    if(pending_interrupt())
+      break;
+
     //calculate common path (find first non common subdir)
-    SEXP filevec = VECTOR_ELT(files, i);
+    SEXP filevec = VECTOR_ELT(paths, i);
     for(int j = 0; j < fmin(Rf_length(filevec), depth); j++){
       if(strcmp(pwd[j], CHAR(STRING_ELT(filevec, j)))){
         //cd up to here
@@ -145,17 +150,36 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP files, SEXP to, SEXP cb){
       bail_if(ssh_scp_push_directory(scp, CHAR(STRING_ELT(filevec, j)), 493L), "ssh_scp_push_directory", ssh);
     }
 
-    //copy file
-    SEXP call = PROTECT(Rf_lcons(cb, Rf_lcons(filevec, R_NilValue)));
-    SEXP data = PROTECT(Rf_eval(call, R_GlobalEnv));
-    const char * filename = CHAR(STRING_ELT(filevec, Rf_length(filevec) - 1));
-    bail_if(ssh_scp_push_file(scp, filename, Rf_length(data), 420L), "ssh_scp_push_file", ssh);
-    bail_if(ssh_scp_write(scp, RAW(data), Rf_length(data)), "ssh_scp_write", ssh);
-    UNPROTECT(2);
-    if(pending_interrupt())
-      break;
+    //empty directories
+    SEXP path = VECTOR_ELT(paths, i);
+    SEXP file = STRING_ELT(path, Rf_length(path) - 1);
+    if(file == NA_STRING)
+      continue;
+
+    //create new file
+    double size = REAL(sizes)[i];
+    bail_if(ssh_scp_push_file(scp, CHAR(file), size, 420L), "ssh_scp_push_file", ssh);
+
+    //write file to channel
+    int read = 0;
+    int total = 0;
+    char buf[16384];
+    FILE *fp = fopen(CHAR(STRING_ELT(sources, i)), "r");
+    if(!fp)
+      Rf_error("Failed to open file %s", CHAR(STRING_ELT(sources, i)));
+    do {
+      bail_if(ssh_scp_write(scp, buf, read), "ssh_scp_write", ssh);
+      read = fread(buf, 1, sizeof(buf), fp);
+      total = total + read;
+      if(size && Rf_asLogical(verbose))
+        Rprintf("\r[%d%%] %s", (int) round(100 * total/size), CHAR(STRING_ELT(sources, i)));
+    } while (read > 0);
+    if(size && Rf_asLogical(verbose))
+      Rprintf("\n");
+    fclose(fp);
   }
 
+  //cd back to root before exiting scp
   while(depth > 0){
     ssh_scp_leave_directory(scp);
     free(pwd[--depth]);
