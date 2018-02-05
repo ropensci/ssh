@@ -14,15 +14,15 @@ compare_dir <- function(ssh, source_dir){
 
 test_that("Upload and download single files", {
   tmp <- tempfile(fileext = '.csv')
-  svn <- R.home("SVN-REVISION")
+  copying <- R.home("COPYING")
   write.csv(iris, tmp)
-  scp_upload(ssh, c(tmp, svn), verbose = FALSE)
+  scp_upload(ssh, c(tmp, copying), verbose = FALSE)
   scp_download(ssh, basename(tmp), verbose = FALSE)
-  scp_download(ssh, basename(svn), verbose = FALSE)
+  scp_download(ssh, basename(copying), verbose = FALSE)
   expect_equal(content(tmp), content(basename(tmp)))
-  expect_equal(content(svn), content(basename(svn)))
-  expect_equal(ssh_exec_internal(ssh, command = paste('rm -f', basename(tmp), basename(svn)))$status, 0)
-  unlink(basename(svn))
+  expect_equal(content(copying), content(basename(copying)))
+  expect_equal(ssh_exec_internal(ssh, command = paste('rm -f', basename(tmp), basename(copying)))$status, 0)
+  unlink(basename(copying))
   unlink(basename(tmp))
 })
 
