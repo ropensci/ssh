@@ -56,7 +56,11 @@ You can use the session in subsequent ssh functions below.
 Run a command or script on the host while streaming stdout and stderr directly to the client.
 
 ```r
-ssh_exec_wait(session, "apt-get update -y && apt-get upgrade -y")
+ssh_exec_wait(session, command = c(
+  'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+  'R CMD check jsonlite_1.5.tar.gz',
+  'rm -f jsonlite_1.5.tar.gz'
+))
 ```
 
 If you want to capture the stdout/stderr:
@@ -66,18 +70,21 @@ out <- ssh_exec_internal(session, "R -e 'rnorm(100)'")
 cat(rawToChar(out$stdout))
 ```
 
-### SCP Single Files
+### Uploading and Downloading via SCP
 
-Simple read a file from the server:
+Upload and download files via SCP. Directories are automatically traversed as in `scp -r`.
 
 ```r
-cat(rawToChar(scp_read_file(session, '/etc/passwd')))
+# Upload a file to the server
+file_path <- R.home("COPYING")
+scp_upload(session, file_path)
 ```
 
-Or upload a file to the server. Here `data` can be a character or raw (binary) vector:
-
 ```r
-scp_write_file(session, "hello/helloworld.txt", data = "Hello World!")
+# Download the file back and verify it is the same
+scp_download(session, "COPYING", to = tempdir())
+tools::md5sum(file_path)
+tools::md5sum(file.path(tempdir(), "COPYING"))
 ```
 
 ### Create a Tunnel

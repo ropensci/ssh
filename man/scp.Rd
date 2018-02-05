@@ -4,7 +4,7 @@
 \alias{scp}
 \alias{scp_download}
 \alias{scp_upload}
-\title{Upload / Download via SCP}
+\title{SCP (Secure Copy)}
 \usage{
 scp_download(session = ssh_connect(), files, to = ".", verbose = TRUE)
 
@@ -13,15 +13,18 @@ scp_upload(session = ssh_connect(), files, to = ".", verbose = TRUE)
 \arguments{
 \item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 
-\item{files}{path to directory or file to upload or download}
+\item{files}{path to files or directory to transfer}
 
-\item{to}{path to an existing location on the local system (for download) or server
-system (for upload) where the target \code{files} will be copied into.
-downloaded files. Default copies everything into working directory for downloads,
-and home directory for uploads.}
+\item{to}{existing directory on the destination where \code{files} will be copied into}
 
-\item{verbose}{print file paths and sizes while copying}
+\item{verbose}{print progress while copying files}
 }
 \description{
-Upload / download files and directories to/from the SSH server.
+Upload and download files to/from the SSH server via the scp protocol.
+Directories in the \code{files} argument are automatically trasversed and
+uploaded / downloaded recursively.
+}
+\details{
+Default path \code{to = "."} means that files get downloaded to the current
+working directory and uploaded to the user home directory on the server.
 }

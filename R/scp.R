@@ -1,41 +1,33 @@
-#' Upload / Download via SCP
+#' SCP (Secure Copy)
 #'
-#' Upload / download files and directories to/from the SSH server.
+#' Upload and download files to/from the SSH server via the scp protocol.
+#' Directories in the `files` argument are automatically trasversed and
+#' uploaded / downloaded recursively.
+#'
+#' Default path `to = "."` means that files get downloaded to the current
+#' working directory and uploaded to the user home directory on the server.
 #'
 #' @export
 #' @rdname scp
 #' @name scp
 #' @useDynLib ssh C_scp_download_recursive
-#' @param to path to an existing location on the local system (for download) or server
-#' system (for upload) where the target `files` will be copied into.
-#' downloaded files. Default copies everything into working directory for downloads,
-#' and home directory for uploads.
-#' @param verbose print file paths and sizes while copying
-#' @param files path to directory or file to upload or download
+#' @param to existing directory on the destination where `files` will be copied into
+#' @param verbose print progress while copying files
+#' @param files path to files or directory to transfer
 #' @inheritParams ssh_tunnel
 scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(is.character(files))
+  stopifnot(is.character(to))
   if(length(files) != 1)
     stop("For scp_download(), the 'files' parameter should be a single file or directory")
-  cb <- if(is.function(to)){
-    function(data, filepath){
-      target <- do.call(file.path, as.list(filepath))
-      if(verbose)
-        cat(sprintf("%10d %s\n", length(data), target))
-      to(data, target);
-    }
-  } else if(is.character(to)){
-    function(data, filepath){
-      target <- do.call(file.path, as.list(c(to, filepath)))
-      if(verbose)
-        cat(sprintf("%10d %s\n", length(data), target))
-      if(!identical(basename(target), target) && !dir.exists(dirname(target)))
-        dir.create(dirname(target), recursive = TRUE)
-      writeBin(data, target)
-    }
-  } else {
-    stop("Parameter 'to' must be a filepath or callback function")
+  cb <- function(data, filepath){
+    target <- do.call(file.path, as.list(c(to, filepath)))
+    if(verbose)
+      cat(sprintf("%10d %s\n", length(data), target))
+    if(is.null(data))
+      return(dir.create(target, recursive = TRUE, showWarnings = FALSE))
+    writeBin(data, target)
   }
   .Call(C_scp_download_recursive, session, files, cb)
 }
