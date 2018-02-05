@@ -147,7 +147,7 @@ void host_tunnel(ssh_channel tunnel, int connfd){
 void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
   int listenfd = open_port(port);
   if(wait_for_fd(listenfd, port) == 0)
-    return;
+    goto cleanup;
   int connfd = accept(listenfd, NULL, NULL);
   syserror_if(connfd < 0, "accept()");
   Rprintf("client connnected!\n");
@@ -156,6 +156,7 @@ void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
   bail_if(tunnel == NULL, "ssh_channel_new", ssh);
   bail_if(ssh_channel_open_forward(tunnel, outhost, outport, "localhost", port), "channel_open_forward", ssh);
   host_tunnel(tunnel, connfd);
+cleanup:
   Rprintf("tunnel closed!\n");
   close(listenfd);
 }
