@@ -17,10 +17,10 @@ test_that("Tunneling works", {
     con$drop()
     if(i == 2){
       tools::pskill(pid, tools::SIGINT)
-      sys::exec_status(pid)
-      expect_error(con$count())
     } else {
       rm(con); gc()
     }
+    expect_equal(sys::exec_status(pid), 0)
+    expect_error(con$count())
   }
 })
