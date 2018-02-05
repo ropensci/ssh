@@ -18,13 +18,17 @@ scp_read_file <- function(session = ssh_connect(), path){
 #' @rdname scp
 #' @name scp
 #' @useDynLib ssh C_scp_download_recursive
-#' @param to either a path to a local directory or a callback function to handle
-#' downloaded files. Default copies everything to current working directory.
+#' @param to path to an existing location on the local system (for download) or server
+#' system (for upload) where the target `files` will be copied into.
+#' downloaded files. Default copies everything into working directory for downloads,
+#' and home directory for uploads.
 #' @param verbose print file paths and sizes while copying
-#' @param from existing directory to copy from
-scp_read_recursive <- function(session = ssh_connect(), from, to = ".", verbose = TRUE){
+#' @param files path to directory or file to upload or download.
+scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
   assert_session(session)
-  stopifnot(is.character(from))
+  stopifnot(is.character(files))
+  if(length(files) != 1)
+    stop("For scp_download(), the 'files' parameter should be a single file or directory")
   cb <- if(is.function(to)){
     function(data, filepath){
       target <- do.call(file.path, as.list(filepath))
@@ -44,7 +48,7 @@ scp_read_recursive <- function(session = ssh_connect(), from, to = ".", verbose 
   } else {
     stop("Parameter 'to' must be a filepath or callback function")
   }
-  .Call(C_scp_download_recursive, session, from, cb)
+  .Call(C_scp_download_recursive, session, files, cb)
 }
 
 #' @rdname scp
@@ -64,19 +68,20 @@ scp_write_file <- function(session = ssh_connect(), path, data){
 #' @rdname scp
 #' @export
 #' @useDynLib ssh C_scp_write_recursive
-scp_write_recursive <- function(session = ssh_connect(), from, to = ".", verbose = TRUE){
+scp_upload <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
   assert_session(session)
-  if(!file.exists(from))
-    stop(sprintf("Directory not found: %s", from))
+  if(!file.exists(files))
+    stop(sprintf("Directory not found: %s", files))
   stopifnot(is.character(to))
-  files <- strsplit(list.files(from, recursive = TRUE, all.files = TRUE), "/")
+  filelist <- strsplit(list.files(files, recursive = TRUE, all.files = TRUE), "/")
+  to <- file.path(to, basename(files))
   cb <- function(filevec){
-    localpath <- do.call(file.path, as.list(c(from, filevec)))
+    localpath <- do.call(file.path, as.list(c(files, filevec)))
     target <- do.call(file.path, as.list(c(to, filevec)))
     fsize <- file.info(localpath)$size
     if(verbose)
       cat(sprintf("%10d %s\n", fsize, target))
     readBin(localpath, raw(), fsize)
   }
-  .Call(C_scp_write_recursive, session, files, to, cb)
+  .Call(C_scp_write_recursive, session, filelist, to, cb)
 }
