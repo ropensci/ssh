@@ -169,12 +169,12 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP sources, SEXP sizes, SEXP paths, SEXP 
     int read = 0;
     int total = 0;
     char buf[16384];
-    FILE *fp = fopen(CHAR(STRING_ELT(sources, i)), "r");
+    FILE *fp = fopen(CHAR(STRING_ELT(sources, i)), "rb");
     if(!fp)
       Rf_error("Failed to open file %s", CHAR(STRING_ELT(sources, i)));
     do {
       bail_if(ssh_scp_write(scp, buf, read), "ssh_scp_write", ssh);
-      read = fread(buf, 1, sizeof(buf), fp);
+      read = fread(buf, sizeof(char), sizeof(buf), fp);
       total = total + read;
       if(size && Rf_asLogical(verbose))
         Rprintf("\r[%d%%] %s", (int) round(100 * total/size), CHAR(STRING_ELT(sources, i)));
