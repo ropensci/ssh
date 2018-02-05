@@ -6,6 +6,7 @@ test_that("Tunneling works", {
     pid <- sys::exec_background(R, c("-e", "ssh::ssh_tunnel()"), std_out = FALSE, std_err = FALSE)
     on.exit(tools::pskill(pid, tools::SIGINT))
     Sys.sleep(3)
+    expect_equal(sys::exec_status(pid, wait = FALSE), NA_integer_)
     con <- mongolite::mongo("mtcars", url = "mongodb://readwrite:test@localhost:5555/jeroen_test")
     expect_is(con, 'mongo')
     if(con$count())
@@ -14,8 +15,12 @@ test_that("Tunneling works", {
     out <- con$find()
     expect_equal(out, mtcars)
     con$drop()
-    if(i == 2)
+    if(i == 2){
       tools::pskill(pid, tools::SIGINT)
-    rm(con); gc()
+      sys::exec_status(pid)
+      expect_error(con$count())
+    } else {
+      rm(con); gc()
+    }
   }
 })
