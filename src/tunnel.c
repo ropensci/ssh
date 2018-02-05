@@ -108,6 +108,7 @@ void host_tunnel(ssh_channel tunnel, int connfd){
   int avail = 1;
   fd_set rfds;
   struct timeval tv = {0, 100000}; //100ms
+  print_progress(-1);
   while(!pending_interrupt() && ssh_channel_is_open(tunnel) && !ssh_channel_is_eof(tunnel)){
     FD_ZERO(&rfds);
     FD_SET(connfd, &rfds);
@@ -116,7 +117,6 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     ssh_select(channels, out, connfd+1, &rfds, &tv);
 
     /* Pipe local socket data to ssh channel */
-    print_progress(-1);
     while((avail = recv(connfd, buf, sizeof(buf), 0)) > 0){
       ssh_channel_write(tunnel, buf, avail);
       print_progress(avail);
