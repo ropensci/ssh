@@ -113,6 +113,11 @@ int open_port(int port){
   //creates the listening socket
   int listenfd = socket(AF_INET, SOCK_STREAM, 0);
   syserror_if(listenfd < 0, "socket()");
+
+  //On Windows it looks like this may be needed to re-use the port after closing??
+  char enable = 1;
+  syserror_if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(char)) < 0, "SO_REUSEADDR");
+
   syserror_if(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0, "bind()");
   syserror_if(listen(listenfd, 0) < 0, "listen()");
   return listenfd;
