@@ -82,3 +82,8 @@ askpass <- function(prompt = "Please enter your password: "){
   FUN <- getOption("askpass", readline)
   FUN(prompt)
 }
+
+assert_session <- function(x){
+  if(!inherits(x, "ssh_session"))
+    stop('Argument "session" must be an ssh session', call. = FALSE)
+}

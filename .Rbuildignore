@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^src/Makevars$
 \.yml$
+^windows
