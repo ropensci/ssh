@@ -180,7 +180,11 @@ void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
   host_tunnel(tunnel, connfd);
 cleanup:
   Rprintf("tunnel closed!\n");
+#ifdef _WIN32
+  closesocket(listenfd);
+#else
   close(listenfd);
+#endif
 }
 
 /* Set up tunnel to the target host */
