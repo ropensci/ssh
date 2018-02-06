@@ -114,7 +114,7 @@ int open_port(int port){
   int listenfd = socket(AF_INET, SOCK_STREAM, 0);
   syserror_if(listenfd < 0, "socket()");
   syserror_if(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0, "bind()");
-  syserror_if(listen(listenfd, 10) < 0, "listen()");
+  syserror_if(listen(listenfd, 0) < 0, "listen()");
   return listenfd;
 }
 
