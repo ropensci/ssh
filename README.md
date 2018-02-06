@@ -69,6 +69,15 @@ If you want to capture the stdout/stderr:
 out <- ssh_exec_internal(session, "R -e 'rnorm(100)'")
 cat(rawToChar(out$stdout))
 ```
+#### Using 'sudo'
+
+Note that the exec functions are non interactive so they cannot prompt for a sudo password. A trick is to use `-S` which reads the passord from stdin:
+
+```
+out <- ssh_exec_wait(session, 'echo "mypassword!" | sudo -s -S apt-get update -y')
+```
+
+Be very careful with hardcoding passwords!
 
 ### Uploading and Downloading via SCP
 
