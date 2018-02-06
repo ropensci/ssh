@@ -186,7 +186,7 @@ void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
     goto cleanup;
   int connfd = accept(listenfd, NULL, NULL);
   syserror_if(connfd < 0, "accept()");
-  Rprintf("client connnected!\n");
+  Rprintf("client connected!\n");
   set_nonblocking(connfd);
   ssh_channel tunnel = ssh_channel_new(ssh);
   bail_if(tunnel == NULL, "ssh_channel_new", ssh);

@@ -18,7 +18,7 @@ won't work). If \code{NULL} the default user key (e.g \code{~/.ssh/id_rsa}) is t
 
 \item{passwd}{either a string or a callback function for password prompt}
 
-\item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
+\item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 }
 \description{
 Create an ssh session using \code{ssh_connect()}. Then use the other functions to

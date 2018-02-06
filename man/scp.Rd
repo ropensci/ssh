@@ -11,7 +11,7 @@ scp_download(session = ssh_connect(), files, to = ".", verbose = TRUE)
 scp_upload(session = ssh_connect(), files, to = ".", verbose = TRUE)
 }
 \arguments{
-\item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
+\item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 
 \item{files}{path to files or directory to transfer}
 
@@ -21,10 +21,20 @@ scp_upload(session = ssh_connect(), files, to = ".", verbose = TRUE)
 }
 \description{
 Upload and download files to/from the SSH server via the scp protocol.
-Directories in the \code{files} argument are automatically trasversed and
+Directories in the \code{files} argument are automatically traversed and
 uploaded / downloaded recursively.
 }
 \details{
-Default path \code{to = "."} means that files get downloaded to the current
+Note that the syntax is slightly different from the \code{scp} command line
+tool because the \code{to} parameter is always a target \emph{directory} where
+all \code{files} will be copied \strong{into}. If \code{to} does not exist, it will be
+created.
+
+The \code{files} parameter in \code{\link[=scp_upload]{scp_upload()}} is vectorised hence all files
+and directories will be recursively uploaded \strong{into} the \code{to} directory.
+For \code{\link[=scp_download]{scp_download()}} the \code{files} parameter must be a single string which
+may contain wildcards.
+
+The default path \code{to = "."} means that files get downloaded to the current
 working directory and uploaded to the user home directory on the server.
 }

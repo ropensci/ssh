@@ -1,10 +1,20 @@
 #' SCP (Secure Copy)
 #'
 #' Upload and download files to/from the SSH server via the scp protocol.
-#' Directories in the `files` argument are automatically trasversed and
+#' Directories in the `files` argument are automatically traversed and
 #' uploaded / downloaded recursively.
 #'
-#' Default path `to = "."` means that files get downloaded to the current
+#' Note that the syntax is slightly different from the `scp` command line
+#' tool because the `to` parameter is always a target *directory* where
+#' all `files` will be copied __into__. If `to` does not exist, it will be
+#' created.
+#'
+#' The `files` parameter in [scp_upload()] is vectorised hence all files
+#' and directories will be recursively uploaded __into__ the `to` directory.
+#' For [scp_download()] the `files` parameter must be a single string which
+#' may contain wildcards.
+#'
+#' The default path `to = "."` means that files get downloaded to the current
 #' working directory and uploaded to the user home directory on the server.
 #'
 #' @export

@@ -8,11 +8,11 @@ ssh_tunnel(session = ssh_connect(), port = 5555,
   target = "ds043942.mongolab.com:43942")
 }
 \arguments{
-\item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
+\item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 
 \item{port}{integer of local port on which to listen for incoming connections}
 
-\item{target}{string with target host and port to connnect to via ssh tunnel}
+\item{target}{string with target host and port to connect to via ssh tunnel}
 }
 \description{
 Opens a port on your machine and tunnel all traffic to a custom target host via the

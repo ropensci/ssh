@@ -40,7 +40,7 @@ ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = as
 #' @export
 #' @rdname ssh
 #' @useDynLib ssh C_disconnect_session
-#' @param session ssh connnection created with [ssh_connect()]
+#' @param session ssh connection created with [ssh_connect()]
 ssh_disconnect <- function(session){
   .Call(C_disconnect_session, session)
   invisible()

@@ -13,7 +13,7 @@ ssh_exec_internal(session = ssh_connect(), command = "whoami",
   error = TRUE)
 }
 \arguments{
-\item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
+\item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 
 \item{command}{The command or script to execute}
 
