@@ -17,6 +17,7 @@
 
 #ifdef _WIN32
 #define NONBLOCK_OK (WSAGetLastError() == WSAEWOULDBLOCK)
+#define SHUTDOWN_SIGNAL SD_BOTH
 void set_nonblocking(int sockfd){
   u_long nonblocking = 1;
   ioctlsocket(sockfd, FIONBIO, &nonblocking);
@@ -44,6 +45,7 @@ const char *formatError(DWORD res){
 #define getsyserror() formatError(GetLastError())
 #else
 #define NONBLOCK_OK (errno == EAGAIN || errno == EWOULDBLOCK)
+#define SHUTDOWN_SIGNAL SHUT_RDWR
 void set_nonblocking(int sockfd){
   long arg = fcntl(sockfd, F_GETFL, NULL);
   arg |= O_NONBLOCK;
@@ -171,6 +173,7 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     print_progress(0); //spinner only
   }
   set_blocking(connfd);
+  shutdown(connfd, SHUTDOWN_SIGNAL);
   ssh_channel_send_eof(tunnel);
   ssh_channel_close(tunnel);
   ssh_channel_free(tunnel);
