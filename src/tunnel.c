@@ -22,6 +22,11 @@ void set_nonblocking(int sockfd){
   ioctlsocket(sockfd, FIONBIO, &nonblocking);
 }
 
+void set_blocking(int sockfd){
+  u_long nonblocking = 0;
+  ioctlsocket(sockfd, FIONBIO, &nonblocking);
+}
+
 const char *formatError(DWORD res){
   static char buf[1000], *p;
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -42,6 +47,11 @@ const char *formatError(DWORD res){
 void set_nonblocking(int sockfd){
   long arg = fcntl(sockfd, F_GETFL, NULL);
   arg |= O_NONBLOCK;
+  fcntl(sockfd, F_SETFL, arg);
+}
+void set_blocking(int sockfd){
+  long arg = fcntl(sockfd, F_GETFL, NULL);
+  arg &= ~O_NONBLOCK;
   fcntl(sockfd, F_SETFL, arg);
 }
 #define getsyserror() strerror(errno)
@@ -160,10 +170,11 @@ void host_tunnel(ssh_channel tunnel, int connfd){
     syserror_if(avail == -1, "ssh_channel_read_nonblocking()");
     print_progress(0); //spinner only
   }
-  close(connfd);
+  set_blocking(connfd);
   ssh_channel_send_eof(tunnel);
   ssh_channel_close(tunnel);
   ssh_channel_free(tunnel);
+  close(connfd);
 }
 
 void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
