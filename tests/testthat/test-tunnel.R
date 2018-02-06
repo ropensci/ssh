@@ -2,7 +2,26 @@ context("tunnel")
 
 R <- file.path(R.home("bin"), "R")
 
-test_that("Tunneling works", {
+test_that("Tunnel: recycle port in process",{
+  # Start tunnel twice!
+  pid <- sys::exec_background(R, c("-e", "library(ssh);ssh_tunnel();ssh_tunnel();"), std_out = FALSE, std_err = FALSE)
+
+  # Connect and disconnect twice on the same parent process
+  for(i in 1:2){
+    Sys.sleep(3)
+    expect_equal(sys::exec_status(pid, wait = FALSE), NA_integer_)
+    con <- mongolite::mongo("mtcars", url = "mongodb://readwrite:test@localhost:5555/jeroen_test")
+    expect_is(con, 'mongo')
+    rm(con); gc();
+  }
+
+  Sys.sleep(3)
+  expect_error(mongolite::mongo("mtcars", url = "mongodb://readwrite:test@localhost:5555/jeroen_test"))
+  expect_equal(sys::exec_status(pid, wait = FALSE), 0)
+})
+
+
+test_that("Tunnel: free port on exit", {
   for(i in 1:3){
     pid <- sys::exec_background(R, c("-e", "ssh::ssh_tunnel()"), std_out = FALSE, std_err = FALSE)
     on.exit(tools::pskill(pid, tools::SIGKILL))
@@ -24,22 +43,4 @@ test_that("Tunneling works", {
     expect_equal(sys::exec_status(pid), 0)
     expect_error(con$count())
   }
-})
-
-test_that("Recycle port",{
-  # Start tunnel twice!
-  pid <- sys::exec_background(R, c("-e", "for(i in 1:2) ssh::ssh_tunnel()"), std_out = FALSE, std_err = FALSE)
-
-  # Connect and disconnect twice on the same parent process
-  for(i in 1:2){
-    Sys.sleep(3)
-    expect_equal(sys::exec_status(pid, wait = FALSE), NA_integer_)
-    con <- mongolite::mongo("mtcars", url = "mongodb://readwrite:test@localhost:5555/jeroen_test")
-    expect_is(con, 'mongo')
-    rm(con); gc();
-  }
-
-  Sys.sleep(3)
-  expect_error(mongolite::mongo("mtcars", url = "mongodb://readwrite:test@localhost:5555/jeroen_test"))
-  expect_equal(sys::exec_status(pid, wait = FALSE), 0)
 })
