@@ -21,26 +21,7 @@ void set_nonblocking(int sockfd){
   u_long nonblocking = 1;
   ioctlsocket(sockfd, FIONBIO, &nonblocking);
 }
-#else
-#define NONBLOCK_OK (errno == EAGAIN || errno == EWOULDBLOCK)
-void set_nonblocking(int sockfd){
-  long arg = fcntl(sockfd, F_GETFL, NULL);
-  arg |= O_NONBLOCK;
-  fcntl(sockfd, F_SETFL, arg);
-}
-#endif
 
-/* Check for interrupt without long jumping */
-void check_interrupt_fn(void *dummy) {
-  R_CheckUserInterrupt();
-}
-
-int pending_interrupt() {
-  return !(R_ToplevelExec(check_interrupt_fn, NULL));
-}
-
-/* check for system errors */
-#if _WIN32
 const char *formatError(DWORD res){
   static char buf[1000], *p;
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -55,17 +36,31 @@ const char *formatError(DWORD res){
   if(*p == '.') *p = '\0';
   return buf;
 }
-void syserror_if(int err, const char * what){
-  if(err && !NONBLOCK_OK)
-    Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, formatError(GetLastError()));
+#define getsyserror() formatError(GetLastError())
+#else
+#define NONBLOCK_OK (errno == EAGAIN || errno == EWOULDBLOCK)
+void set_nonblocking(int sockfd){
+  long arg = fcntl(sockfd, F_GETFL, NULL);
+  arg |= O_NONBLOCK;
+  fcntl(sockfd, F_SETFL, arg);
+}
+#define getsyserror() strerror(errno)
+#endif
+
+/* Check for interrupt without long jumping */
+void check_interrupt_fn(void *dummy) {
+  R_CheckUserInterrupt();
 }
 
-#else
+int pending_interrupt() {
+  return !(R_ToplevelExec(check_interrupt_fn, NULL));
+}
+
+/* check for system errors */
 void syserror_if(int err, const char * what){
   if(err && !NONBLOCK_OK)
-    Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, strerror(errno));
+    Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, getsyserror());
 }
-#endif
 
 char spinner(){
   static int x;
