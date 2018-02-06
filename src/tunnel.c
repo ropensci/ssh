@@ -40,10 +40,32 @@ int pending_interrupt() {
 }
 
 /* check for system errors */
+#if _WIN32
+const char *formatError(DWORD res){
+  static char buf[1000], *p;
+  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL, res,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                buf, 1000, NULL);
+  p = buf+strlen(buf) -1;
+  if(*p == '\n') *p = '\0';
+  p = buf+strlen(buf) -1;
+  if(*p == '\r') *p = '\0';
+  p = buf+strlen(buf) -1;
+  if(*p == '.') *p = '\0';
+  return buf;
+}
+void syserror_if(int err, const char * what){
+  if(err && !NONBLOCK_OK)
+    Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, formatError(GetLastError()));
+}
+
+#else
 void syserror_if(int err, const char * what){
   if(err && !NONBLOCK_OK)
     Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, strerror(errno));
 }
+#endif
 
 char spinner(){
   static int x;
@@ -156,8 +178,8 @@ void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
   bail_if(tunnel == NULL, "ssh_channel_new", ssh);
   bail_if(ssh_channel_open_forward(tunnel, outhost, outport, "localhost", port), "channel_open_forward", ssh);
   host_tunnel(tunnel, connfd);
-  Rprintf("tunnel closed!\n");
 cleanup:
+  Rprintf("tunnel closed!\n");
   close(listenfd);
 }
 
