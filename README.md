@@ -10,13 +10,13 @@
 
 ## Installation
 
-Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
+Currently the package is not available on CRAN:
 
 ```r
-install.packages("ssh")
+devtools::install_github('ropensci/ssh')
 ```
 
-Installation from source on Linux requires [`libssh`](https://www.libssh.org/) (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
+Installation from source on MacOS or Linux requires [`libssh`](https://www.libssh.org/) (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
 
 ```
 sudo apt-get install -y libssh-dev
