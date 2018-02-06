@@ -11,7 +11,7 @@
 #' @rdname ssh_tunnel
 #' @family ssh
 #' @useDynLib ssh C_blocking_tunnel
-#' @param session ssh connnection created with [ssh_connect()]
+#' @inheritParams ssh_connect
 #' @param port integer of local port on which to listen for incoming connections
 #' @param target string with target host and port to connnect to via ssh tunnel
 ssh_tunnel <- function(session = ssh_connect(), port = 5555, target = "ds043942.mongolab.com:43942") {

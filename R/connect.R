@@ -15,6 +15,7 @@
 #'
 #' @export
 #' @useDynLib ssh C_start_session
+#' @rdname ssh
 #' @aliases ssh
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
@@ -34,6 +35,15 @@ ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = as
   if(length(keyfile))
     keyfile <- normalizePath(keyfile, mustWork = TRUE)
   .Call(C_start_session, details$host, details$port, details$user, keyfile, passwd)
+}
+
+#' @export
+#' @rdname ssh
+#' @useDynLib ssh C_disconnect_session
+#' @param session ssh connnection created with [ssh_connect()]
+ssh_disconnect <- function(session){
+  .Call(C_disconnect_session, session)
+  invisible()
 }
 
 parse_host <- function(str, default_port){

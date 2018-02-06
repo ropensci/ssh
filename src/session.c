@@ -155,3 +155,8 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
 
   return ssh_ptr_create(ssh);
 }
+
+SEXP C_disconnect_session(SEXP ptr){
+  ssh_ptr_fin(ptr);
+  return R_NilValue;
+}

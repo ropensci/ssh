@@ -14,7 +14,7 @@
 #' @param to existing directory on the destination where `files` will be copied into
 #' @param verbose print progress while copying files
 #' @param files path to files or directory to transfer
-#' @inheritParams ssh_tunnel
+#' @inheritParams ssh_connect
 scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(is.character(files))

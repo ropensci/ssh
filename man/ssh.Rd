@@ -3,9 +3,12 @@
 \name{ssh_connect}
 \alias{ssh_connect}
 \alias{ssh}
+\alias{ssh_disconnect}
 \title{SSH Client}
 \usage{
 ssh_connect(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass)
+
+ssh_disconnect(session)
 }
 \arguments{
 \item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
@@ -14,6 +17,8 @@ ssh_connect(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass)
 won't work). If \code{NULL} the default user key (e.g \code{~/.ssh/id_rsa}) is tried.}
 
 \item{passwd}{either a string or a callback function for password prompt}
+
+\item{session}{ssh connnection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 }
 \description{
 Create an ssh session using \code{ssh_connect()}. Then use the other functions to

@@ -16,7 +16,7 @@
 #' @name ssh_exec
 #' @family ssh
 #' @useDynLib ssh C_ssh_exec
-#' @inheritParams ssh_tunnel
+#' @inheritParams ssh_connect
 #' @param command The command or script to execute
 #' @param std_out callback function, filename, or connection object to handle stdout stream
 #' @param std_err callback function, filename, or connection object to handle stderr stream
