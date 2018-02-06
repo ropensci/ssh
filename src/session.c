@@ -8,7 +8,9 @@ ssh_session ssh_ptr_get(SEXP ptr){
 }
 
 static void ssh_ptr_fin(SEXP ptr){
-  ssh_session ssh = ssh_ptr_get(ptr);
+  ssh_session ssh = (ssh_session) R_ExternalPtrAddr(ptr);
+  if(ssh == NULL)
+    return;
   ssh_disconnect(ssh);
   ssh_free(ssh);
   R_ClearExternalPtr(ptr);
