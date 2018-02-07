@@ -1,7 +1,7 @@
 #' Create SSH tunnel
 #'
 #' Opens a port on your machine and tunnel all traffic to a custom target host via the
-#' SSH server, for example to connect to a database server behind a firewall.
+#' SSH server, for example to connect with a database server behind a firewall.
 #'
 #' This function blocks while the tunnel is active. Use the tunnel by connecting to
 #' `localhost:5555` from a separate process. Each tunnel can only be used once and will
@@ -14,7 +14,7 @@
 #' @inheritParams ssh_connect
 #' @param port integer of local port on which to listen for incoming connections
 #' @param target string with target host and port to connect to via ssh tunnel
-ssh_tunnel <- function(session = ssh_connect(), port = 5555, target = "ds043942.mongolab.com:43942") {
+ssh_tunnel <- function(session = ssh_connect(), port = 5555, target = "cran.r-project.org:21") {
   assert_session(session)
   stopifnot(is.numeric(port))
   target <- parse_host(target)

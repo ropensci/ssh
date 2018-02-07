@@ -5,7 +5,7 @@
 \title{Create SSH tunnel}
 \usage{
 ssh_tunnel(session = ssh_connect(), port = 5555,
-  target = "ds043942.mongolab.com:43942")
+  target = "cran.r-project.org:21")
 }
 \arguments{
 \item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
@@ -16,7 +16,7 @@ ssh_tunnel(session = ssh_connect(), port = 5555,
 }
 \description{
 Opens a port on your machine and tunnel all traffic to a custom target host via the
-SSH server, for example to connect to a database server behind a firewall.
+SSH server, for example to connect with a database server behind a firewall.
 }
 \details{
 This function blocks while the tunnel is active. Use the tunnel by connecting to
