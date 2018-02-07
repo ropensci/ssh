@@ -20,6 +20,13 @@
 #' @param command The command or script to execute
 #' @param std_out callback function, filename, or connection object to handle stdout stream
 #' @param std_err callback function, filename, or connection object to handle stderr stream
+#' @examples \dontrun{
+#' session <- ssh_connect("dev.opencpu.org")
+#' ssh_exec_wait(command = c(
+#'   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+#'   'R CMD check jsonlite_1.5.tar.gz',
+#'   'rm -f jsonlite_1.5.tar.gz'
+#' ))}
 ssh_exec_wait <- function(session = ssh_connect(), command = "whoami", std_out = stdout(), std_err = stderr()) {
   assert_session(session)
   stopifnot(is.character(command))

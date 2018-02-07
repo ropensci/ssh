@@ -36,8 +36,17 @@ Similarly \code{\link[=ssh_exec_internal]{ssh_exec_internal()}} is a small wrapp
 It buffers all stdout and stderr output into a raw vector and returns it in a list along with
 the exit status. By default this function raises an error if the remote command was unsuccessful.
 }
+\examples{
+\dontrun{
+session <- ssh_connect("dev.opencpu.org")
+ssh_exec_wait(command = c(
+  'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+  'R CMD check jsonlite_1.5.tar.gz',
+  'rm -f jsonlite_1.5.tar.gz'
+))}
+}
 \seealso{
-Other ssh: \code{\link{ssh_connect}},
+Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
   \code{\link{ssh_tunnel}}
 }
 \concept{ssh}

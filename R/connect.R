@@ -1,17 +1,21 @@
 #' SSH Client
 #'
-#' Create an ssh session using `ssh_connect()`. Then use the other functions to
-#' run commands or create a tunnel via this ssh session.
+#' Create an ssh session using `ssh_connect()`. The session can be used to execute
+#' commands, scp files or setup a tunnel.
 #'
-#' The client first tries to authenticate using a private key, if available. When
-#' this fails it tries challenge-response (interactive) and password auth. The
+#' The client first tries to authenticate using a private key, either from ssh-agent
+#' or `/.ssh/id_rsa` in the user home directory. If this fails it falls back on
+#' challenge-response (interactive) and password auth if allowed by the server. The
 #' `passwd` parameter can be used to provide a passphrase or a callback function to
 #' ask prompt the user for the passphrase when needed.
 #'
+#' The session will automatically be disconnected when the session object is removed
+#' or when R exits but you can also use [ssh_disconnect()].
+#'
 #' __Windows users:__ the private key must be in OpenSSH PEM format. If you open it in
-#' a text editor it must start with something like `-----BEGIN RSA PRIVATE KEY-----`.
-#' To use your Putty PKK key, open it in the *PuttyGen* utility and go to
-#' *Conversions->Export OpenSSH*.
+#' a text editor the first line must be: `-----BEGIN RSA PRIVATE KEY-----`.
+#' To convert a Putty PKK key, open it in the *PuttyGen* utility and go to
+#' *Conversions -> Export OpenSSH*.
 #'
 #' @export
 #' @useDynLib ssh C_start_session
@@ -19,15 +23,13 @@
 #' @aliases ssh
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
-#' @param keyfile path to private key file. Must be in OpenSSH format (putty PKK files
-#' won't work). If `NULL` the default user key (e.g `~/.ssh/id_rsa`) is tried.
+#' @param keyfile path to private key file. Must be in OpenSSH format (see details)
 #' @family ssh
 #' @examples \dontrun{
-#' ssh_exec_wait(command = c(
-#'   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
-#'   'R CMD check jsonlite_1.5.tar.gz',
-#'   'rm -f jsonlite_1.5.tar.gz'
-#' ))}
+#' session <- ssh_connect("dev.opencpu.org")
+#' ssh_exec_wait(session, command = "whoami")
+#' ssh_disconnect(session)
+#' }
 ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass) {
   stopifnot(is.character(host))
   stopifnot(is.character(passwd) || is.function(passwd))

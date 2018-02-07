@@ -13,37 +13,40 @@ ssh_disconnect(session)
 \arguments{
 \item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
 
-\item{keyfile}{path to private key file. Must be in OpenSSH format (putty PKK files
-won't work). If \code{NULL} the default user key (e.g \code{~/.ssh/id_rsa}) is tried.}
+\item{keyfile}{path to private key file. Must be in OpenSSH format (see details)}
 
 \item{passwd}{either a string or a callback function for password prompt}
 
 \item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 }
 \description{
-Create an ssh session using \code{ssh_connect()}. Then use the other functions to
-run commands or create a tunnel via this ssh session.
+Create an ssh session using \code{ssh_connect()}. The session can be used to execute
+commands, scp files or setup a tunnel.
 }
 \details{
-The client first tries to authenticate using a private key, if available. When
-this fails it tries challenge-response (interactive) and password auth. The
+The client first tries to authenticate using a private key, either from ssh-agent
+or \code{/.ssh/id_rsa} in the user home directory. If this fails it falls back on
+challenge-response (interactive) and password auth if allowed by the server. The
 \code{passwd} parameter can be used to provide a passphrase or a callback function to
 ask prompt the user for the passphrase when needed.
 
+The session will automatically be disconnected when the session object is removed
+or when R exits but you can also use \code{\link[=ssh_disconnect]{ssh_disconnect()}}.
+
 \strong{Windows users:} the private key must be in OpenSSH PEM format. If you open it in
-a text editor it must start with something like \code{-----BEGIN RSA PRIVATE KEY-----}.
-To use your Putty PKK key, open it in the \emph{PuttyGen} utility and go to
-\emph{Conversions->Export OpenSSH}.
+a text editor the first line must be: \code{-----BEGIN RSA PRIVATE KEY-----}.
+To convert a Putty PKK key, open it in the \emph{PuttyGen} utility and go to
+\emph{Conversions -> Export OpenSSH}.
 }
 \examples{
 \dontrun{
-ssh_exec_wait(command = c(
-  'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
-  'R CMD check jsonlite_1.5.tar.gz',
-  'rm -f jsonlite_1.5.tar.gz'
-))}
+session <- ssh_connect("dev.opencpu.org")
+ssh_exec_wait(session, command = "whoami")
+ssh_disconnect(session)
+}
 }
 \seealso{
-Other ssh: \code{\link{ssh_exec}}, \code{\link{ssh_tunnel}}
+Other ssh: \code{\link{scp}}, \code{\link{ssh_exec}},
+  \code{\link{ssh_tunnel}}
 }
 \concept{ssh}

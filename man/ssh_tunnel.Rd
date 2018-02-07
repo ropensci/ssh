@@ -16,15 +16,15 @@ ssh_tunnel(session = ssh_connect(), port = 5555,
 }
 \description{
 Opens a port on your machine and tunnel all traffic to a custom target host via the
-SSH server.
+SSH server, for example to connect to a database server behind a firewall.
 }
 \details{
 This function blocks while the tunnel is active. Use the tunnel by connecting to
-\code{localhost:5555} from a separate process. The tunnel can only be used once and will
+\code{localhost:5555} from a separate process. Each tunnel can only be used once and will
 automatically be closed when the client disconnects.
 }
 \seealso{
-Other ssh: \code{\link{ssh_connect}},
+Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
   \code{\link{ssh_exec}}
 }
 \concept{ssh}

@@ -1,10 +1,10 @@
 #' Create SSH tunnel
 #'
 #' Opens a port on your machine and tunnel all traffic to a custom target host via the
-#' SSH server.
+#' SSH server, for example to connect to a database server behind a firewall.
 #'
 #' This function blocks while the tunnel is active. Use the tunnel by connecting to
-#' `localhost:5555` from a separate process. The tunnel can only be used once and will
+#' `localhost:5555` from a separate process. Each tunnel can only be used once and will
 #' automatically be closed when the client disconnects.
 #'
 #' @export

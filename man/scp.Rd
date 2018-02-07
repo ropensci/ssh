@@ -38,3 +38,22 @@ may contain wildcards.
 The default path \code{to = "."} means that files get downloaded to the current
 working directory and uploaded to the user home directory on the server.
 }
+\examples{
+\dontrun{
+# recursively upload files and directories
+session <- ssh_connect("dev.opencpu.org")
+files <- c(R.home("doc"), R.home("COPYING"))
+scp_upload(session, files, to = "~/target")
+
+# download it back
+scp_download(session, "~/target/*", to = tempdir())
+
+# delete it from the server
+ssh_exec_wait(session, command = "rm -Rf ~/target")
+}
+}
+\seealso{
+Other ssh: \code{\link{ssh_connect}},
+  \code{\link{ssh_exec}}, \code{\link{ssh_tunnel}}
+}
+\concept{ssh}

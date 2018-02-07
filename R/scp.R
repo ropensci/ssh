@@ -20,11 +20,24 @@
 #' @export
 #' @rdname scp
 #' @name scp
+#' @family ssh
 #' @useDynLib ssh C_scp_download_recursive
 #' @param to existing directory on the destination where `files` will be copied into
 #' @param verbose print progress while copying files
 #' @param files path to files or directory to transfer
 #' @inheritParams ssh_connect
+#' @examples \dontrun{
+#' # recursively upload files and directories
+#' session <- ssh_connect("dev.opencpu.org")
+#' files <- c(R.home("doc"), R.home("COPYING"))
+#' scp_upload(session, files, to = "~/target")
+#'
+#' # download it back
+#' scp_download(session, "~/target/*", to = tempdir())
+#'
+#' # delete it from the server
+#' ssh_exec_wait(session, command = "rm -Rf ~/target")
+#' }
 scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(is.character(files))
