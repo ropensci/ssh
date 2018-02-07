@@ -5,7 +5,8 @@
 #'
 #' This function blocks while the tunnel is active. Use the tunnel by connecting to
 #' `localhost:5555` from a separate process. Each tunnel can only be used once and will
-#' automatically be closed when the client disconnects.
+#' automatically be closed when the client disconnects. It is intended to tunnel a single
+#' connection, not as a long running proxy server.
 #'
 #' @export
 #' @rdname ssh_tunnel
