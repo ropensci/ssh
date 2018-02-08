@@ -1,3 +1,4 @@
+#include <R.h> /* for R_ProcessEvents() */
 #include "myssh.h"
 
 #include <unistd.h>
@@ -61,6 +62,7 @@ void set_blocking(int sockfd){
 
 /* Check for interrupt without long jumping */
 void check_interrupt_fn(void *dummy) {
+  R_ProcessEvents();
   R_CheckUserInterrupt();
 }
 
