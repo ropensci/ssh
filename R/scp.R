@@ -38,7 +38,7 @@
 #' # delete it from the server
 #' ssh_exec_wait(session, command = "rm -Rf ~/target")
 #' }
-scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
+scp_download <- function(session, files, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(is.character(files))
   stopifnot(is.character(to))
@@ -58,7 +58,7 @@ scp_download <- function(session = ssh_connect(), files, to = ".", verbose = TRU
 #' @rdname scp
 #' @export
 #' @useDynLib ssh C_scp_write_recursive
-scp_upload <- function(session = ssh_connect(), files, to = ".", verbose = TRUE){
+scp_upload <- function(session, files, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(is.character(files))
   stopifnot(is.character(to))
@@ -89,7 +89,7 @@ list_all <- function(files, hidden = FALSE){
 }
 
 #' @useDynLib ssh C_scp_write_file
-scp_write_file <- function(session = ssh_connect(), path, data){
+scp_write_file <- function(session, path, data){
   assert_session(session)
   stopifnot(is.character(path))
   if(is.character(data))
@@ -99,7 +99,7 @@ scp_write_file <- function(session = ssh_connect(), path, data){
 }
 
 #' @useDynLib ssh C_scp_read_file
-scp_read_file <- function(session = ssh_connect(), path){
+scp_read_file <- function(session, path){
   assert_session(session)
   stopifnot(is.character(path))
   .Call(C_scp_read_file, session, path)

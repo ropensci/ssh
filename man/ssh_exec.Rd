@@ -6,11 +6,10 @@
 \alias{ssh_exec_internal}
 \title{Execute Remote Command}
 \usage{
-ssh_exec_wait(session = ssh_connect(), command = "whoami",
-  std_out = stdout(), std_err = stderr())
+ssh_exec_wait(session, command = "whoami", std_out = stdout(),
+  std_err = stderr())
 
-ssh_exec_internal(session = ssh_connect(), command = "whoami",
-  error = TRUE)
+ssh_exec_internal(session, command = "whoami", error = TRUE)
 }
 \arguments{
 \item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}

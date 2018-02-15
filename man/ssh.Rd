@@ -7,8 +7,7 @@
 \alias{ssh_disconnect}
 \title{SSH Client}
 \usage{
-ssh_connect(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass,
-  verbose = FALSE)
+ssh_connect(host, keyfile = NULL, passwd = askpass, verbose = FALSE)
 
 ssh_info(session)
 

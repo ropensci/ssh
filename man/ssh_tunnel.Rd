@@ -4,8 +4,7 @@
 \alias{ssh_tunnel}
 \title{Create SSH tunnel}
 \usage{
-ssh_tunnel(session = ssh_connect(), port = 5555,
-  target = "cran.r-project.org:21")
+ssh_tunnel(session, port = 5555, target = "cran.r-project.org:21")
 }
 \arguments{
 \item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}

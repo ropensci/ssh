@@ -32,7 +32,7 @@
 #' ssh_exec_wait(session, command = "whoami")
 #' ssh_disconnect(session)
 #' }
-ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass, verbose = FALSE) {
+ssh_connect <- function(host, keyfile = NULL, passwd = askpass, verbose = FALSE) {
   if(is.logical(verbose))
     verbose <- 2 * verbose # TRUE == 'protocol'
   stopifnot(verbose %in% 0:4)

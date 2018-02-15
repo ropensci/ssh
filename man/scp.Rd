@@ -6,9 +6,9 @@
 \alias{scp_upload}
 \title{SCP (Secure Copy)}
 \usage{
-scp_download(session = ssh_connect(), files, to = ".", verbose = TRUE)
+scp_download(session, files, to = ".", verbose = TRUE)
 
-scp_upload(session = ssh_connect(), files, to = ".", verbose = TRUE)
+scp_upload(session, files, to = ".", verbose = TRUE)
 }
 \arguments{
 \item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}

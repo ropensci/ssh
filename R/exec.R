@@ -27,7 +27,7 @@
 #'   'R CMD check jsonlite_1.5.tar.gz',
 #'   'rm -f jsonlite_1.5.tar.gz'
 #' ))}
-ssh_exec_wait <- function(session = ssh_connect(), command = "whoami", std_out = stdout(), std_err = stderr()) {
+ssh_exec_wait <- function(session, command = "whoami", std_out = stdout(), std_err = stderr()) {
   assert_session(session)
   stopifnot(is.character(command))
   command <- paste(command, collapse = "\n")
@@ -90,7 +90,7 @@ ssh_exec_wait <- function(session = ssh_connect(), command = "whoami", std_out =
 #' @param error automatically raise an error if the exit status is non-zero
 #' @rdname ssh_exec
 #' @useDynLib ssh C_ssh_exec
-ssh_exec_internal <- function(session = ssh_connect(), command = "whoami", error = TRUE){
+ssh_exec_internal <- function(session, command = "whoami", error = TRUE){
   outcon <- rawConnection(raw(0), "r+")
   on.exit(close(outcon), add = TRUE)
   errcon <- rawConnection(raw(0), "r+")
