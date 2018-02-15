@@ -108,5 +108,5 @@ assert_session <- function(x){
 #' @export
 print.ssh_session <- function(x, ...){
   info <- ssh_info(x)
-  cat(sprintf("<ssh session> %s@%s:%d\n", info$user, info$host, info$port))
+  cat(sprintf("<ssh session>\nconnected: %s@%s:%d\nserver: %s\n", info$user, info$host, info$port, info$sha1))
 }
