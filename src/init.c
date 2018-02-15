@@ -2,6 +2,7 @@
 #define STRICT_R_HEADERS
 
 #include <Rinternals.h>
+#include <R_ext/Rdynload.h>
 #include <libssh/callbacks.h>
 
 void log_cb(int priority, const char *function, const char *buffer, void *userdata){
