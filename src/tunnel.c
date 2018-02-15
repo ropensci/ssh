@@ -191,8 +191,9 @@ void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
   Rprintf("client connected!\n");
   set_nonblocking(connfd);
   ssh_channel tunnel = ssh_channel_new(ssh);
-  bail_if(tunnel == NULL, "ssh_channel_new", ssh);
-  bail_if(ssh_channel_open_forward(tunnel, outhost, outport, "localhost", port), "channel_open_forward", ssh);
+  if(tunnel == NULL)
+    Rf_error("Error in ssh_channel_new(): %s\n", ssh_get_error(ssh));
+  assert_channel(ssh_channel_open_forward(tunnel, outhost, outport, "localhost", port), "channel_open_forward", tunnel);
   host_tunnel(tunnel, connfd);
 cleanup:
   Rprintf("tunnel closed!\n");

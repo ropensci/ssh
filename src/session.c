@@ -24,7 +24,7 @@ static SEXP ssh_ptr_create(ssh_session ssh){
   return ptr;
 }
 
-void bail_if(int rc, const char * what, ssh_session ssh){
+static void assert_ssh(int rc, const char * what, ssh_session ssh){
   if (rc != SSH_OK){
     char buf[1024];
     strncpy(buf, ssh_get_error(ssh), 1024);
@@ -64,7 +64,7 @@ static int auth_password(ssh_session ssh, SEXP rpass){
   char buf[1024];
   password_cb(rpass, "Please enter your password", buf);
   int rc = ssh_userauth_password(ssh, NULL, buf);
-  bail_if(rc == SSH_AUTH_ERROR, "password auth", ssh);
+  assert_ssh(rc == SSH_AUTH_ERROR, "password auth", ssh);
   return rc;
 }
 
@@ -122,10 +122,10 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   const char * host = CHAR(STRING_ELT(rhost, 0));
   const char * user = CHAR(STRING_ELT(ruser, 0));
   ssh_session ssh = ssh_new();
-  bail_if(ssh_options_set(ssh, SSH_OPTIONS_HOST, host), "set host", ssh);
-  bail_if(ssh_options_set(ssh, SSH_OPTIONS_USER, user), "set user", ssh);
-  bail_if(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
-  bail_if(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &loglevel), "set verbosity", ssh);
+  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_HOST, host), "set host", ssh);
+  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_USER, user), "set user", ssh);
+  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
+  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &loglevel), "set verbosity", ssh);
 
   /* sets password callback for default private key */
   struct ssh_callbacks_struct cb = {
@@ -136,7 +136,7 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   ssh_set_callbacks(ssh, &cb);
 
   /* connect */
-  bail_if(ssh_connect(ssh), "connect", ssh);
+  assert_ssh(ssh_connect(ssh), "connect", ssh);
 
   /* get server identity */
   ssh_key key;
