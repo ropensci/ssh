@@ -6,7 +6,8 @@
 \alias{ssh_disconnect}
 \title{SSH Client}
 \usage{
-ssh_connect(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass)
+ssh_connect(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass,
+  verbose = FALSE)
 
 ssh_disconnect(session)
 }
@@ -16,6 +17,9 @@ ssh_disconnect(session)
 \item{keyfile}{path to private key file. Must be in OpenSSH format (see details)}
 
 \item{passwd}{either a string or a callback function for password prompt}
+
+\item{verbose}{either TRUE/FALSE or a value between 0 and 4 indicating log level:
+0: no logging, 1: only warnings, 2: protocol, 3: packets or 4: full stack trace.}
 
 \item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
 }

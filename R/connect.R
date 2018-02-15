@@ -24,19 +24,24 @@
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
 #' @param keyfile path to private key file. Must be in OpenSSH format (see details)
+#' @param verbose either TRUE/FALSE or a value between 0 and 4 indicating log level:
+#' 0: no logging, 1: only warnings, 2: protocol, 3: packets or 4: full stack trace.
 #' @family ssh
 #' @examples \dontrun{
 #' session <- ssh_connect("dev.opencpu.org")
 #' ssh_exec_wait(session, command = "whoami")
 #' ssh_disconnect(session)
 #' }
-ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass) {
+ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = askpass, verbose = FALSE) {
+  if(is.logical(verbose))
+    verbose <- 2 * verbose # TRUE == 'protocol'
+  stopifnot(verbose %in% 0:4)
   stopifnot(is.character(host))
   stopifnot(is.character(passwd) || is.function(passwd))
   details <- parse_host(host, default_port = 22)
   if(length(keyfile))
     keyfile <- normalizePath(keyfile, mustWork = TRUE)
-  .Call(C_start_session, details$host, details$port, details$user, keyfile, passwd)
+  .Call(C_start_session, details$host, details$port, details$user, keyfile, passwd, verbose)
 }
 
 #' @export
