@@ -114,7 +114,7 @@ SEXP C_scp_download_recursive(SEXP ptr, SEXP path, SEXP cb){
       free(pwd[--depth]);
       break;
     case SSH_SCP_REQUEST_WARNING:
-      REprintf("SSH warning: %s\n",ssh_scp_request_get_warning(scp));
+      Rf_warningcall_immediate(R_NilValue, "SSH warning: %s\n",ssh_scp_request_get_warning(scp));
       break;
     case SSH_SCP_REQUEST_EOF:
       goto cleanup;
