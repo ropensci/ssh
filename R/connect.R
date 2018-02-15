@@ -46,9 +46,19 @@ ssh_connect <- function(host = "dev.opencpu.org:22", keyfile = NULL, passwd = as
 
 #' @export
 #' @rdname ssh
+#' @useDynLib ssh C_ssh_info
+ssh_info <- function(session){
+  assert_session(session)
+  out <- .Call(C_ssh_info, session)
+  structure(out, names = c("user", "host", "identity", "port", "connected", "sha1"))
+}
+
+#' @export
+#' @rdname ssh
 #' @useDynLib ssh C_disconnect_session
 #' @param session ssh connection created with [ssh_connect()]
 ssh_disconnect <- function(session){
+  assert_session(session)
   .Call(C_disconnect_session, session)
   invisible()
 }
@@ -93,4 +103,10 @@ askpass <- function(prompt = "Please enter your password: "){
 assert_session <- function(x){
   if(!inherits(x, "ssh_session"))
     stop('Argument "session" must be an ssh session', call. = FALSE)
+}
+
+#' @export
+print.ssh_session <- function(x, ...){
+  info <- ssh_info(x)
+  cat(sprintf("<ssh session> %s@%s:%d\n", info$user, info$host, info$port))
 }

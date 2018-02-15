@@ -144,8 +144,10 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   size_t hlen = 0;
   assert_ssh(ssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
   assert_ssh(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
-  if(!ssh_is_server_known(ssh))
-    Rprintf("Unknown server fingerprint: %s\n", ssh_get_hexa(hash, hlen));
+  if(!ssh_is_server_known(ssh)){
+    Rprintf("New server fingerprint: %s\n", ssh_get_hexa(hash, hlen));
+    ssh_write_knownhost(ssh);
+  }
 
   /* Authenticate client */
   auth_any(ssh, privkey, rpass);
@@ -158,6 +160,40 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   }
 
   return ssh_ptr_create(ssh);
+}
+
+SEXP C_ssh_info(SEXP ptr){
+  ssh_session ssh = ssh_ptr_get(ptr);
+  unsigned int port;
+  char * user = NULL;
+  char * host = NULL;
+  char * identity = NULL;
+  int connected = ssh_is_connected(ssh);
+  ssh_options_get_port(ssh, &port);
+  ssh_options_get(ssh, SSH_OPTIONS_USER, &user);
+  ssh_options_get(ssh, SSH_OPTIONS_HOST, &host);
+  ssh_options_get(ssh, SSH_OPTIONS_IDENTITY, &identity);
+
+
+  ssh_key key;
+  unsigned char * hash = NULL;
+  size_t hlen = 0;
+  assert_ssh(ssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
+  assert_ssh(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
+
+  SEXP out = PROTECT(Rf_allocVector(VECSXP, 6));
+  SET_VECTOR_ELT(out, 0, make_string(user));
+  SET_VECTOR_ELT(out, 1, make_string(host));
+  SET_VECTOR_ELT(out, 2, make_string(identity));
+  SET_VECTOR_ELT(out, 3, Rf_ScalarInteger(port));
+  SET_VECTOR_ELT(out, 4, Rf_ScalarLogical(connected));
+  SET_VECTOR_ELT(out, 5, make_string(ssh_get_hexa(hash, hlen)));
+
+  if(user) ssh_string_free_char(user);
+  if(host) ssh_string_free_char(host);
+  if(identity) ssh_string_free_char(identity);
+  UNPROTECT(1);
+  return out;
 }
 
 SEXP C_disconnect_session(SEXP ptr){
