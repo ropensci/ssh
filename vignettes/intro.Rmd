@@ -1,0 +1,186 @@
+---
+title: "Secure Shell (SSH) Client for R"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_caption: false
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Secure Shell (SSH) Client for R}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(comment = "")
+options(width = 120, max.print = 100)
+library(ssh)
+```
+
+## Installation
+
+On Windows or MacOS you can install the binary package directly from CRAN:
+
+```r
+install.packages("ssh")
+```
+
+Installation from source requires [`libssh`](https://www.libssh.org/) (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
+
+```
+sudo apt-get install -y libssh-dev
+```
+
+On __Fedora__ we need [libssh-devel](https://apps.fedoraproject.org/packages/libssh-devel):
+
+```
+sudo yum install libssh-devel
+````
+
+On __CentOS / RHEL__ we install [libssh-devel](https://apps.fedoraproject.org/packages/libssh-devel) via EPEL:
+
+```
+sudo yum install epel-release
+sudo yum install libssh-devel
+```
+
+On __OS-X__ use [libssh](https://github.com/Homebrew/homebrew-core/blob/master/Formula/libssh.rb) from Homebrew:
+
+```
+brew install libssh
+```
+
+## Connecting to an SSH server
+
+First create an ssh session by connecting to an SSH server.
+
+
+```{r}
+session <- ssh_connect("jeroen@dev.opencpu.org")
+print(session)
+```
+
+Once established, a session is closed automatically by the garbage collector when the object goes out of scope or when R quits. You can also manually close it using `ssh_disconnect()` but this is not strictly needed.
+
+
+## Authentication
+
+The client attempts to use the following authentication methods (in this order) until one succeeds:
+
+ 1. try key from `privkey` argument in `ssh_connect()` if specified
+ 2. if ssh-agent is available, try private key from ssh-agent
+ 3. try user key specified in `~/.ssh/config` or any of the default locations: `~/.ssh/id_ed25519`, `~/.ssh/id_ecdsa`, `~/.ssh/id_rsa`, or `.ssh/id_dsa`.
+ 4. Try challenge-response password authentication (if permitted by the server)
+ 5. Try plain password authentication (if permitted by the server)
+
+To debug authentication set verbosity to at least level 2 or 3:
+
+```r
+session <- ssh_connect("jeroen@dev.opencpu.org", verbose = 3)
+```
+```
+ssh_socket_connect: Nonblocking connection socket: 7
+ssh_connect: Socket connecting, now waiting for the callbacks to work
+socket_callback_connected: Socket connection callback: 1 (0)
+ssh_client_connection_callback: SSH server banner: SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.4
+ssh_analyze_banner: Analyzing banner: SSH-2.0-OpenSSH_7.2p2 Ubuntu-4ubuntu2.4
+ssh_analyze_banner: We are talking to an OpenSSH client version: 7.2 (70200)
+ssh_packet_dh_reply: Received SSH_KEXDH_REPLY
+ssh_client_curve25519_reply: SSH_MSG_NEWKEYS sent
+ssh_packet_newkeys: Received SSH_MSG_NEWKEYS
+ssh_packet_newkeys: Signature verified and valid
+ssh_packet_userauth_failure: Access denied. Authentication that can continue: publickey
+ssh_packet_userauth_failure: Access denied. Authentication that can continue: publickey
+ssh_agent_get_ident_count: Answer type: 12, expected answer: 12
+ssh_userauth_publickey_auto: Successfully authenticated using /Users/jeroen/.ssh/id_rsa
+```
+
+## Execute Script or Command
+
+Run a command or script on the host and block while it runs. By default stdout and stderr are steamed directly back to the client. This function returns the exit status of the remote command (hence it does not automatically error for an unsuccesful exit status). 
+
+```{r}
+out <- ssh_exec_wait(session, command = 'whoami')
+print(out)
+```
+
+You can also run a script that consists of multiple commands.
+
+
+```r
+ssh_exec_wait(session, command = c(
+  'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+  'R CMD check jsonlite_1.5.tar.gz',
+  'rm -f jsonlite_1.5.tar.gz'
+))
+```
+```
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 1071k  100 1071k    0     0   654k      0  0:00:01  0:00:01 --:--:--  654k
+* using log directory '/home/jeroen/jsonlite.Rcheck'
+* using R version 3.4.3 (2017-11-30)
+* using platform: x86_64-pc-linux-gnu (64-bit)
+* using session charset: ASCII
+* checking for file 'jsonlite/DESCRIPTION' ... OK
+* this is package 'jsonlite' version '1.5'
+* checking package namespace information ... OK
+* checking package dependencies ...
+...
+```
+
+### Capturing output
+
+The `ssh_exec_internal()` is a convenient wrapper for `ssh_exec_wait()` which buffers the output steams and returns them as a raw vector. Also it raises an error by default when the remote command was not successful.
+
+```{r}
+out <- ssh_exec_internal(session, "R -e 'rnorm(10)'")
+print(out$status)
+cat(rawToChar(out$stdout))
+```
+
+This function is very useful if you are running a remote command and want to use it's output as if you had executed it locally.
+
+### Using sudo
+
+Note that the exec functions are non interactive so they cannot prompt for a sudo password. A trick is to use `-S` which reads the password from stdin:
+
+```r
+command <- 'echo "mypassword!" | sudo -s -S apt-get update -y'
+out <- ssh_exec_wait(session, command)
+```
+
+Be very careful with hardcoding passwords!
+
+## Transfer Files via SCP
+
+Upload and download files via SCP. Directories are automatically traversed as in `scp -r`.
+
+```r
+# Upload a file to the server
+file_path <- R.home("COPYING")
+scp_upload(session, file_path)
+```
+
+```r
+# Download the file back and verify it is the same
+scp_download(session, "COPYING", to = tempdir())
+tools::md5sum(file_path)
+tools::md5sum(file.path(tempdir(), "COPYING"))
+```
+
+## Hosting a Tunnel
+
+Opens a port on your machine and tunnel all traffic to a custom target host via the SSH server.
+
+```r
+ssh_tunnel(session, port = 5555,target = "ds043942.mongolab.com:43942")
+```
+
+This function blocks while the tunnel is active. Use the tunnel by connecting to `localhost:5555` from a separate process. The tunnel can only be used once and will automatically be closed when the client disconnects.
+
