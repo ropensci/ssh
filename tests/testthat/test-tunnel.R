@@ -37,7 +37,7 @@ test_that("Tunnel: free port on exit", {
     out <- con$find()
     expect_equal(out, mtcars)
     con$drop()
-    if(i == 2){
+    if(i == 2 && Sys.info()[["sysname"]] != "Windows"){
       tools::pskill(pid, tools::SIGINT)
     } else {
       rm(con); gc()
