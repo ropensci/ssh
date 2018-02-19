@@ -1,6 +1,6 @@
 context("scp")
 
-ssh <- ssh_connect()
+ssh <- ssh_connect('dev.opencpu.org')
 
 content <- function(x){
   unname(tools::md5sum(x))
