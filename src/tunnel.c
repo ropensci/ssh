@@ -128,9 +128,12 @@ int open_port(int port){
   int listenfd = socket(AF_INET, SOCK_STREAM, 0);
   syserror_if(listenfd < 0, "socket()");
 
-  //Workaround for Windows TcpTimedWaitDelay (doesn't work)
-  //char enable = 1;
-  //syserror_if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(char)) < 0, "SO_REUSEADDR");
+  //Allows immediate reuse of a port in TIME_WAIT state.
+  //for Windows see TcpTimedWaitDelay (doesn't work)
+#ifndef _WIN32
+  int enable = 1;
+  syserror_if(setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0, "SO_REUSEADDR");
+#endif
 
   syserror_if(bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0, "bind()");
   syserror_if(listen(listenfd, 0) < 0, "listen()");

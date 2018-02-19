@@ -15,7 +15,7 @@
 #' @inheritParams ssh_connect
 #' @param port integer of local port on which to listen for incoming connections
 #' @param target string with target host and port to connect to via ssh tunnel
-ssh_tunnel <- function(session, port = 5555, target = "towel.blinkenlights.nl:23") {
+ssh_tunnel <- function(session, port = 5555, target = "rainmaker.wunderground.com:23") {
   assert_session(session)
   stopifnot(is.numeric(port))
   target <- parse_host(target)
