@@ -1,7 +1,7 @@
 Package: ssh
 Type: Package
 Title: Secure Shell (SSH) Client for R
-Version: 0.1
+Version: 0.2
 Author: Jeroen Ooms
 Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
 Description: Bindings to libssh for connecting to an SSH server.
