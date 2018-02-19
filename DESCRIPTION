@@ -13,6 +13,7 @@ Roxygen: list(markdown = TRUE)
 Imports: getPass
 Suggests:
     knitr,
+    rmarkdown,
     spelling, 
     sys,
     testthat
