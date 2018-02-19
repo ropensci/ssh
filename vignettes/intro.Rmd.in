@@ -1,6 +1,6 @@
 ---
 title: "Secure Shell (SSH) Client for R"
-date: "2018-02-19"
+date: "`r Sys.Date()`"
 output:
   html_document:
     fig_caption: false
@@ -16,7 +16,11 @@ vignette: >
 ---
 
 
-
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(comment = "")
+options(width = 120, max.print = 100)
+library(ssh)
+```
 
 ## Installation
 
@@ -56,16 +60,9 @@ brew install libssh
 First create an ssh session by connecting to an SSH server.
 
 
-
-```r
+```{r}
 session <- ssh_connect("jeroen@dev.opencpu.org")
 print(session)
-```
-
-```
-<ssh session>
-connected: jeroen@dev.opencpu.org:22
-server: 1e:28:44:af:84:91:e5:88:fe:82:ca:34:d7:c8:cf:a8:0d:2f:ec:af
 ```
 
 Once established, a session is closed automatically by the garbage collector when the object goes out of scope or when R quits. You can also manually close it using `ssh_disconnect()` but this is not strictly needed.
@@ -107,21 +104,9 @@ ssh_userauth_publickey_auto: Successfully authenticated using /Users/jeroen/.ssh
 
 Run a command or script on the host and block while it runs. By default stdout and stderr are steamed directly back to the client. This function returns the exit status of the remote command (hence it does not automatically error for an unsuccessful exit status). 
 
-
-```r
+```{r}
 out <- ssh_exec_wait(session, command = 'whoami')
-```
-
-```
-jeroen
-```
-
-```r
 print(out)
-```
-
-```
-[1] 0
 ```
 
 You can also run a script that consists of multiple commands.
@@ -153,43 +138,10 @@ ssh_exec_wait(session, command = c(
 
 The `ssh_exec_internal()` is a convenient wrapper for `ssh_exec_wait()` which buffers the output steams and returns them as a raw vector. Also it raises an error by default when the remote command was not successful.
 
-
-```r
+```{r}
 out <- ssh_exec_internal(session, "R -e 'rnorm(10)'")
 print(out$status)
-```
-
-```
-[1] 0
-```
-
-```r
 cat(rawToChar(out$stdout))
-```
-
-```
-
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
-
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under certain conditions.
-Type 'license()' or 'licence()' for distribution details.
-
-R is a collaborative project with many contributors.
-Type 'contributors()' for more information and
-'citation()' on how to cite R or R packages in publications.
-
-Type 'demo()' for some demos, 'help()' for on-line help, or
-'help.start()' for an HTML browser interface to help.
-Type 'q()' to quit R.
-
-> rnorm(10)
- [1] -0.97621665 -0.42186282 -0.13265079  0.20949687 -1.64813126 -1.67003036
- [7]  0.05383791 -1.08055751 -0.52278298  0.96349704
-> 
-> 
 ```
 
 This function is very useful if you are running a remote command and want to use it's output as if you had executed it locally.
