@@ -96,7 +96,7 @@ me <- function(){
 }
 
 askpass <- function(prompt = "Please enter your password: "){
-  FUN <- getOption("askpass", readline)
+  FUN <- getOption("askpass", getPass::getPass)
   FUN(prompt)
 }
 

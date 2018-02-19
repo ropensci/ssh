@@ -81,7 +81,7 @@ The client attempts to use the following authentication methods (in this order) 
 To debug authentication set verbosity to at least level 2 or 3:
 
 ```r
-session <- ssh_connect("jeroen@dev.opencpu.org", verbose = 3)
+session <- ssh_connect("jeroen@dev.opencpu.org", verbose = 2)
 ```
 ```
 ssh_socket_connect: Nonblocking connection socket: 7
