@@ -102,7 +102,7 @@ ssh_userauth_publickey_auto: Successfully authenticated using /Users/jeroen/.ssh
 
 ## Execute Script or Command
 
-Run a command or script on the host and block while it runs. By default stdout and stderr are steamed directly back to the client. This function returns the exit status of the remote command (hence it does not automatically error for an unsuccesful exit status). 
+Run a command or script on the host and block while it runs. By default stdout and stderr are steamed directly back to the client. This function returns the exit status of the remote command (hence it does not automatically error for an unsuccessful exit status). 
 
 ```{r}
 out <- ssh_exec_wait(session, command = 'whoami')
@@ -179,7 +179,7 @@ tools::md5sum(file.path(tempdir(), "COPYING"))
 Opens a port on your machine and tunnel all traffic to a custom target host via the SSH server.
 
 ```r
-ssh_tunnel(session, port = 5555,target = "ds043942.mongolab.com:43942")
+ssh_tunnel(session, port = 5555, target = "ds043942.mongolab.com:43942")
 ```
 
 This function blocks while the tunnel is active. Use the tunnel by connecting to `localhost:5555` from a separate process. The tunnel can only be used once and will automatically be closed when the client disconnects.

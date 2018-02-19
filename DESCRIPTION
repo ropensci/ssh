@@ -12,7 +12,9 @@ RoxygenNote: 6.0.1.9000
 Roxygen: list(markdown = TRUE)
 Imports: getPass
 Suggests:
+    knitr,
     spelling, 
     sys,
     testthat
 Language: en-GB
+VignetteBuilder: knitr
