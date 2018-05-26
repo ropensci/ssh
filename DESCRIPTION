@@ -16,6 +16,7 @@ Suggests:
     rmarkdown,
     spelling, 
     sys,
-    testthat
+    testthat,
+    mongolite
 Language: en-GB
 VignetteBuilder: knitr
