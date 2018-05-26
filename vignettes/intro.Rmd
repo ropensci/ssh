@@ -1,6 +1,6 @@
 ---
 title: "Secure Shell (SSH) Client for R"
-date: "2018-02-19"
+date: "2018-05-27"
 output:
   html_document:
     fig_caption: false
@@ -59,13 +59,30 @@ First create an ssh session by connecting to an SSH server.
 
 ```r
 session <- ssh_connect("jeroen@dev.opencpu.org")
+```
+
+```
+Calling my_auth_callback
+```
+
+```
+Error in ssh_connect("jeroen@dev.opencpu.org"): Authentication failed, permission denied
+```
+
+```r
 print(session)
 ```
 
 ```
-<ssh session>
-connected: jeroen@dev.opencpu.org:22
-server: 1e:28:44:af:84:91:e5:88:fe:82:ca:34:d7:c8:cf:a8:0d:2f:ec:af
+Error in print(session): object 'session' not found
+```
+
+```r
+knitr:::fig_path("out1")
+```
+
+```
+[1] "figure/unnamed-chunk-2-1.out1"
 ```
 
 Once established, a session is closed automatically by the garbage collector when the object goes out of scope or when R quits. You can also manually close it using `ssh_disconnect()` but this is not strictly needed.
@@ -109,11 +126,19 @@ Run a command or script on the host and block while it runs. By default stdout a
 
 
 ```r
+knitr:::fig_path("out2")
+```
+
+```
+[1] "figure/unnamed-chunk-3-1.out2"
+```
+
+```r
 out <- ssh_exec_wait(session, command = 'whoami')
 ```
 
 ```
-jeroen
+Error in assert_session(session): object 'session' not found
 ```
 
 ```r
@@ -121,7 +146,7 @@ print(out)
 ```
 
 ```
-[1] 0
+Error in print(out): object 'out' not found
 ```
 
 You can also run a script that consists of multiple commands.
@@ -156,11 +181,18 @@ The `ssh_exec_internal()` is a convenient wrapper for `ssh_exec_wait()` which bu
 
 ```r
 out <- ssh_exec_internal(session, "R -e 'rnorm(10)'")
+```
+
+```
+Error in assert_session(session): object 'session' not found
+```
+
+```r
 print(out$status)
 ```
 
 ```
-[1] 0
+Error in print(out$status): object 'out' not found
 ```
 
 ```r
@@ -168,28 +200,7 @@ cat(rawToChar(out$stdout))
 ```
 
 ```
-
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
-
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under certain conditions.
-Type 'license()' or 'licence()' for distribution details.
-
-R is a collaborative project with many contributors.
-Type 'contributors()' for more information and
-'citation()' on how to cite R or R packages in publications.
-
-Type 'demo()' for some demos, 'help()' for on-line help, or
-'help.start()' for an HTML browser interface to help.
-Type 'q()' to quit R.
-
-> rnorm(10)
- [1] -0.97621665 -0.42186282 -0.13265079  0.20949687 -1.64813126 -1.67003036
- [7]  0.05383791 -1.08055751 -0.52278298  0.96349704
-> 
-> 
+Error in rawToChar(out$stdout): object 'out' not found
 ```
 
 This function is very useful if you are running a remote command and want to use it's output as if you had executed it locally.

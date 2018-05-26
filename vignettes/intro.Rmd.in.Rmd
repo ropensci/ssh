@@ -63,6 +63,7 @@ First create an ssh session by connecting to an SSH server.
 ```{r}
 session <- ssh_connect("jeroen@dev.opencpu.org")
 print(session)
+knitr:::fig_path("out1")
 ```
 
 Once established, a session is closed automatically by the garbage collector when the object goes out of scope or when R quits. You can also manually close it using `ssh_disconnect()` but this is not strictly needed.
@@ -105,6 +106,7 @@ ssh_userauth_publickey_auto: Successfully authenticated using /Users/jeroen/.ssh
 Run a command or script on the host and block while it runs. By default stdout and stderr are steamed directly back to the client. This function returns the exit status of the remote command (hence it does not automatically error for an unsuccessful exit status). 
 
 ```{r}
+knitr:::fig_path("out2")
 out <- ssh_exec_wait(session, command = 'whoami')
 print(out)
 ```

@@ -3,3 +3,4 @@
 ^src/Makevars$
 \.yml$
 ^windows
+\.in\.Rmd$
