@@ -48,4 +48,3 @@ ssh_exec_wait(command = c(
 Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
   \code{\link{ssh_tunnel}}
 }
-\concept{ssh}

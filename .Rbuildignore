@@ -4,3 +4,4 @@
 \.yml$
 ^windows
 \.in\.Rmd$
+README.md$
