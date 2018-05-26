@@ -65,24 +65,14 @@ session <- ssh_connect("jeroen@dev.opencpu.org")
 Calling my_auth_callback
 ```
 
-```
-Error in ssh_connect("jeroen@dev.opencpu.org"): Authentication failed, permission denied
-```
-
 ```r
 print(session)
 ```
 
 ```
-Error in print(session): object 'session' not found
-```
-
-```r
-knitr:::fig_path("out1")
-```
-
-```
-[1] "figure/unnamed-chunk-2-1.out1"
+<ssh session>
+connected: jeroen@dev.opencpu.org:22
+server: 1e:28:44:af:84:91:e5:88:fe:82:ca:34:d7:c8:cf:a8:0d:2f:ec:af
 ```
 
 Once established, a session is closed automatically by the garbage collector when the object goes out of scope or when R quits. You can also manually close it using `ssh_disconnect()` but this is not strictly needed.
@@ -126,19 +116,11 @@ Run a command or script on the host and block while it runs. By default stdout a
 
 
 ```r
-knitr:::fig_path("out2")
-```
-
-```
-[1] "figure/unnamed-chunk-3-1.out2"
-```
-
-```r
 out <- ssh_exec_wait(session, command = 'whoami')
 ```
 
 ```
-Error in assert_session(session): object 'session' not found
+jeroen
 ```
 
 ```r
@@ -146,7 +128,7 @@ print(out)
 ```
 
 ```
-Error in print(out): object 'out' not found
+[1] 0
 ```
 
 You can also run a script that consists of multiple commands.
@@ -154,9 +136,9 @@ You can also run a script that consists of multiple commands.
 
 ```r
 ssh_exec_wait(session, command = c(
-  'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
-  'R CMD check jsonlite_1.5.tar.gz',
-  'rm -f jsonlite_1.5.tar.gz'
+  'curl -O https://cran.r-project.org/src/contrib/Archive/jsonlite/jsonlite_1.4.tar.gz',
+  'R CMD check jsonlite_1.4.tar.gz',
+  'rm -f jsonlite_1.4.tar.gz'
 ))
 ```
 ```
@@ -168,7 +150,7 @@ ssh_exec_wait(session, command = c(
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * using session charset: ASCII
 * checking for file 'jsonlite/DESCRIPTION' ... OK
-* this is package 'jsonlite' version '1.5'
+* this is package 'jsonlite' version '1.4'
 * checking package namespace information ... OK
 * checking package dependencies ...
 ...
@@ -181,18 +163,11 @@ The `ssh_exec_internal()` is a convenient wrapper for `ssh_exec_wait()` which bu
 
 ```r
 out <- ssh_exec_internal(session, "R -e 'rnorm(10)'")
-```
-
-```
-Error in assert_session(session): object 'session' not found
-```
-
-```r
 print(out$status)
 ```
 
 ```
-Error in print(out$status): object 'out' not found
+[1] 0
 ```
 
 ```r
@@ -200,7 +175,28 @@ cat(rawToChar(out$stdout))
 ```
 
 ```
-Error in rawToChar(out$stdout): object 'out' not found
+
+R version 3.4.4 (2018-03-15) -- "Someone to Lean On"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rnorm(10)
+ [1]  0.14301778 -0.26873489  0.83931307  0.22034917  0.87214122 -0.13655736
+ [7] -0.08793867 -0.68616146  0.23469591  0.93871035
+> 
+> 
 ```
 
 This function is very useful if you are running a remote command and want to use it's output as if you had executed it locally.
