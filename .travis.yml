@@ -5,10 +5,7 @@ fortran: false
 
 matrix:
   include:
-    - os: linux
-      r: devel
-    - os: linux
-      r: oldrel
+    - r: devel
     - os: linux
       env: R_CODECOV=true
     - os: osx
