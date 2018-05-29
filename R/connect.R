@@ -110,3 +110,10 @@ print.ssh_session <- function(x, ...){
   info <- ssh_info(x)
   cat(sprintf("<ssh session>\nconnected: %s@%s:%d\nserver: %s\n", info$user, info$host, info$port, info$sha1))
 }
+
+#' @export
+#' @useDynLib ssh C_libssh_version
+#' @rdname ssh
+libssh_version <- function(){
+  .Call(C_libssh_version)
+}

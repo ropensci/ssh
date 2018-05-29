@@ -200,3 +200,7 @@ SEXP C_disconnect_session(SEXP ptr){
   ssh_ptr_fin(ptr);
   return R_NilValue;
 }
+
+SEXP C_libssh_version(){
+  return Rf_mkString(SSH_STRINGIFY(LIBSSH_VERSION));
+}

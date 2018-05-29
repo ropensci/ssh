@@ -5,6 +5,7 @@
 \alias{ssh}
 \alias{ssh_info}
 \alias{ssh_disconnect}
+\alias{libssh_version}
 \title{SSH Client}
 \usage{
 ssh_connect(host, keyfile = NULL, passwd = askpass, verbose = FALSE)
@@ -12,6 +13,8 @@ ssh_connect(host, keyfile = NULL, passwd = askpass, verbose = FALSE)
 ssh_info(session)
 
 ssh_disconnect(session)
+
+libssh_version()
 }
 \arguments{
 \item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}}
