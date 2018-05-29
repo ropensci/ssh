@@ -142,7 +142,7 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   ssh_key key;
   unsigned char * hash = NULL;
   size_t hlen = 0;
-  assert_ssh(ssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
+  assert_ssh(myssh_get_publickey(ssh, &key), "myssh_get_publickey", ssh);
   assert_ssh(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
   if(!ssh_is_server_known(ssh)){
     Rprintf("New server fingerprint: %s\n", ssh_get_hexa(hash, hlen));
@@ -178,7 +178,7 @@ SEXP C_ssh_info(SEXP ptr){
   ssh_key key;
   unsigned char * hash = NULL;
   size_t hlen = 0;
-  assert_ssh(ssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
+  assert_ssh(myssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
   assert_ssh(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
 
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 6));
