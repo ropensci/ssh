@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* function has been renamed */
-#if defined(LIBSSH_VERSION_INT) && LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,8,0)
+/* Debian ships with libssh 0.8.0 which has a bug so it looks like 0.7.0 */
+#if defined(LIBSSH_VERSION_INT) && (LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,8,0) || LIBSSH_VERSION_INT == SSH_VERSION_INT(0,7,0))
 #define myssh_get_publickey ssh_get_server_publickey
 #else
 #define myssh_get_publickey ssh_get_publickey
