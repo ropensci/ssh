@@ -54,7 +54,6 @@ static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024]){
 }
 
 int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int verify, void *userdata){
-  Rprintf("Calling my_auth_callback\n");
   SEXP rpass = (SEXP) userdata;
   password_cb(rpass, prompt, buf);
   return SSH_OK;
