@@ -22,7 +22,7 @@
 #' @param std_err callback function, filename, or connection object to handle stderr stream
 #' @examples \dontrun{
 #' session <- ssh_connect("dev.opencpu.org")
-#' ssh_exec_wait(command = c(
+#' ssh_exec_wait(session, command = c(
 #'   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
 #'   'R CMD check jsonlite_1.5.tar.gz',
 #'   'rm -f jsonlite_1.5.tar.gz'
