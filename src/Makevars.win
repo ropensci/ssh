@@ -1,4 +1,4 @@
-LIBSSH = ../windows/libssh-0.7.5
+LIBSSH = ../windows/libssh-0.8.3
 
 PKG_CPPFLAGS = -DLIBSSH_STATIC \
 	-I${LIBSSH}/include
