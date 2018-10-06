@@ -27,7 +27,7 @@ static SEXP ssh_ptr_create(ssh_session ssh){
 static void assert_ssh(int rc, const char * what, ssh_session ssh){
   if (rc != SSH_OK){
     char buf[1024];
-    strncpy(buf, ssh_get_error(ssh), 1024);
+    strncpy(buf, ssh_get_error(ssh), 1023);
     ssh_disconnect(ssh);
     ssh_free(ssh);
     Rf_errorcall(R_NilValue, "libssh failure at '%s': %s", what, buf);

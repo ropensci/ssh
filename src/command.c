@@ -3,7 +3,7 @@
 void assert_channel(int rc, const char * what, ssh_channel channel){
   if (rc != SSH_OK){
     char buf[1024];
-    strncpy(buf, ssh_get_error(ssh_channel_get_session(channel)), 1024);
+    strncpy(buf, ssh_get_error(ssh_channel_get_session(channel)), 1023);
     ssh_channel_close (channel);
     ssh_channel_free(channel);
     Rf_errorcall(R_NilValue, "libssh failure at '%s': %s", what, buf);

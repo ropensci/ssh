@@ -11,7 +11,7 @@
 static void assert_scp(int rc, const char * what, ssh_scp scp, ssh_session ssh){
   if (rc != SSH_OK){
     char buf[1024];
-    strncpy(buf, ssh_get_error(ssh), 1024);
+    strncpy(buf, ssh_get_error(ssh), 1023);
     ssh_scp_close(scp);
     ssh_scp_free(scp);
     Rf_errorcall(R_NilValue, "SCP failure: %s", buf);
@@ -20,7 +20,7 @@ static void assert_scp(int rc, const char * what, ssh_scp scp, ssh_session ssh){
 
 static void enter_directory(ssh_scp scp, char * path, ssh_session ssh){
   char subdir[4000];
-  strncpy(subdir, basename(path), 4000);
+  strncpy(subdir, basename(path), 3999);
   if(strcmp(path, basename(path)))
     enter_directory(scp, dirname(path), ssh);
   assert_scp(ssh_scp_push_directory(scp, subdir, 493L), "ssh_scp_push_directory", scp, ssh);
@@ -71,8 +71,8 @@ SEXP C_scp_write_file(SEXP ptr, SEXP path, SEXP data){
   assert_scp(ssh_scp_init(scp), "ssh_scp_init", scp, ssh);
   char cpath[4000];
   char filename[4000];
-  strncpy(cpath, CHAR(STRING_ELT(path, 0)), 4000);
-  strncpy(filename, basename(cpath), 4000);
+  strncpy(cpath, CHAR(STRING_ELT(path, 0)), 3999);
+  strncpy(filename, basename(cpath), 3999);
   if(strcmp(cpath, filename))
     enter_directory(scp, dirname(cpath), ssh);
   assert_scp(ssh_scp_push_file(scp, filename, Rf_length(data), 420L), "ssh_scp_push_file", scp, ssh);
