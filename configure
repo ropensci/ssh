@@ -11,7 +11,7 @@ PKG_DEB_NAME="libssh-dev"
 PKG_RPM_NAME="libssh-devel"
 PKG_BREW_NAME="libssh"
 PKG_TEST_HEADER="<libssh/libssh.h>"
-PKG_LIBS_STATIC="-lssh -lcrypto -lz"
+PKG_LIBS_STATIC="-lssh -lcrypto -lz -lkrb5"
 PKG_LIBS="-lssh"
 PKG_CFLAGS=""
 
