@@ -1,0 +1,7 @@
+0.3:
+  - Windows/Mac: update libssh to 0.8.3
+  - Fix GCC 8 compiler warnings
+  - Don't use deprecated function on libssh 0.8+
+
+0.2:
+  - Initial release
