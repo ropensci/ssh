@@ -1,6 +1,5 @@
 ---
 title: "Secure Shell (SSH) Client for R"
-date: "2018-05-27"
 output:
   html_document:
     fig_caption: false
