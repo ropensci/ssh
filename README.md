@@ -11,7 +11,13 @@
 
 ## Installation
 
-Currently the package is not available on CRAN:
+This package is available on CRAN and can be installed via:
+
+```r
+install.packages('ssh')
+```
+
+Alternatively it can be installed from source using `devtools`:
 
 ```r
 devtools::install_github('ropensci/ssh')
