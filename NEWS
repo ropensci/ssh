@@ -1,5 +1,6 @@
 0.4:
-  - Fix for problem in latest openssh-server patch release
+  - Fix for security problem with latest openssh-server
+  - Windows/Mac: update libssh to 0.8.6
 
 0.3:
   - Windows/Mac: update libssh to 0.8.3
