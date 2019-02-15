@@ -38,7 +38,7 @@ the exit status. By default this function raises an error if the remote command 
 \examples{
 \dontrun{
 session <- ssh_connect("dev.opencpu.org")
-ssh_exec_wait(command = c(
+ssh_exec_wait(session, command = c(
   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
   'R CMD check jsonlite_1.5.tar.gz',
   'rm -f jsonlite_1.5.tar.gz'
@@ -48,3 +48,4 @@ ssh_exec_wait(command = c(
 Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
   \code{\link{ssh_tunnel}}
 }
+\concept{ssh}

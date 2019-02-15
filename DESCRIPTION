@@ -12,7 +12,7 @@ Encoding: UTF-8
 SystemRequirements: libssh (the original, not libssh2)
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
-Imports: getPass
+Imports: askpass
 Suggests:
     knitr,
     rmarkdown,

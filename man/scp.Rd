@@ -56,3 +56,4 @@ ssh_exec_wait(session, command = "rm -Rf ~/target")
 Other ssh: \code{\link{ssh_connect}},
   \code{\link{ssh_exec}}, \code{\link{ssh_tunnel}}
 }
+\concept{ssh}

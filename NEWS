@@ -1,6 +1,7 @@
 0.4:
   - Fix for security problem with latest openssh-server
   - Windows/Mac: update libssh to 0.8.6
+  - Use askpass instead of getPass package
 
 0.3:
   - Windows/Mac: update libssh to 0.8.3

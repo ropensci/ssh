@@ -21,6 +21,7 @@
 #' @useDynLib ssh C_start_session
 #' @rdname ssh
 #' @aliases ssh
+#' @importFrom askpass askpass
 #' @param host an ssh server string of the form `[user@]hostname[:@port]`
 #' @param passwd either a string or a callback function for password prompt
 #' @param keyfile path to private key file. Must be in OpenSSH format (see details)
@@ -93,11 +94,6 @@ parse_host <- function(str, default_port){
 
 me <- function(){
   tolower(Sys.info()[["user"]])
-}
-
-askpass <- function(prompt = "Please enter your password: "){
-  FUN <- getOption("askpass", getPass::getPass)
-  FUN(prompt)
 }
 
 assert_session <- function(x){
