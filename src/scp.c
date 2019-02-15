@@ -136,8 +136,6 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP sources, SEXP sizes, SEXP paths, SEXP 
   ssh_session ssh = ssh_ptr_get(ptr);
   ssh_scp scp = ssh_scp_new(ssh, SSH_SCP_WRITE | SSH_SCP_RECURSIVE, CHAR(STRING_ELT(to, 0)));
   assert_scp(ssh_scp_init(scp), "ssh_scp_init", scp, ssh);
-  if(ssh_scp_push_directory(scp, ".", 493L) != SSH_OK)
-    Rf_errorcall(R_NilValue, "Failed to create: %s (no such directory?)\n", CHAR(STRING_ELT(to, 0)));
   int depth = 0;
   char * pwd[1000];
   for(int i = 0; i < Rf_length(paths); i++){

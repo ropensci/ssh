@@ -1,7 +1,7 @@
 Package: ssh
 Type: Package
 Title: Secure Shell (SSH) Client for R
-Version: 0.3
+Version: 0.4
 Authors@R: person("Jeroen", "Ooms", role = c("aut", "cre"), 
     email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289"))
 Description: Connect to a remote server over SSH to transfer files via SCP, 
@@ -10,7 +10,7 @@ Description: Connect to a remote server over SSH to transfer files via SCP,
 License: MIT + file LICENSE
 Encoding: UTF-8
 SystemRequirements: libssh (the original, not libssh2)
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 Imports: getPass
 Suggests:

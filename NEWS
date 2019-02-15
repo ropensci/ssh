@@ -1,3 +1,6 @@
+0.4:
+  - Fix for problem in latest openssh-server patch release
+
 0.3:
   - Windows/Mac: update libssh to 0.8.3
   - Fix GCC 8 compiler warnings
