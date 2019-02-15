@@ -61,7 +61,7 @@ int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int ve
 
 static int auth_password(ssh_session ssh, SEXP rpass){
   char buf[1024];
-  password_cb(rpass, "Please enter your password", buf);
+  password_cb(rpass, "Please enter your ssh password", buf);
   int rc = ssh_userauth_password(ssh, NULL, buf);
   assert_ssh(rc == SSH_AUTH_ERROR, "password auth", ssh);
   return rc;
