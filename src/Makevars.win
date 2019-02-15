@@ -1,5 +1,5 @@
-VERSION = 0.27.8
-RWINLIB = ../windows/libgit2-${VERSION}
+VERSION = 0.8.6
+RWINLIB = ../windows/libssh-${VERSION}
 
 PKG_CPPFLAGS = -DLIBSSH_STATIC \
 	-I${RWINLIB}/include
