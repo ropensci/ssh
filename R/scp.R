@@ -41,7 +41,7 @@
 scp_download <- function(session, files, to = ".", verbose = TRUE){
   assert_session(session)
   stopifnot(is.character(files))
-  stopifnot(is.character(to))
+  to <- normalizePath(to, mustWork = TRUE)
   if(length(files) != 1)
     stop("For scp_download(), the 'files' parameter should be a single file or directory")
   cb <- function(data, filepath){
