@@ -77,14 +77,22 @@ parse_host <- function(str, default_port){
     user <- me()
     x[1]
   }
-  x <- strsplit(host, ":", fixed = TRUE)[[1]]
-  if(length(x) > 2) stop("host string contains multiple ':' characters")
-  host <- x[1]
-  port <- if(length(x) > 1){
-    as.numeric(x[2])
+
+  # Check for port
+  m <- gregexpr(':[0-9]+$', host, ignore.case = TRUE)
+  port <- sub("^:", "", regmatches(host, m)[[1]])
+  port <- if(length(port)){
+    as.numeric(port)
   } else {
     as.numeric(default_port)
   }
+  host <- sub(':[0-9]+$', '', host)
+  if(grepl("^\\[.*\\]$", host)){
+    host <- sub('\\]$', '', sub('^\\[', "", host))
+  } else if(grepl(":", host)){
+    stop(sprintf("Invalid hostname '%s'. Use brackets for ipv6 hosts like this: [2001:db8::1]:22", host))
+  }
+
   list(
     user = user,
     host = host,
