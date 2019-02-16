@@ -75,8 +75,8 @@ SEXP C_scp_write_file(SEXP ptr, SEXP path, SEXP data){
   strncpy(filename, basename(cpath), 3999);
   if(strcmp(cpath, filename))
     enter_directory(scp, dirname(cpath), ssh);
-  assert_scp(ssh_scp_push_file(scp, filename, Rf_length(data), 420L), "ssh_scp_push_file", scp, ssh);
-  assert_scp(ssh_scp_write(scp, RAW(data), Rf_length(data)), "ssh_scp_write", scp, ssh);
+  assert_scp(ssh_scp_push_file(scp, filename, Rf_xlength(data), 420L), "ssh_scp_push_file", scp, ssh);
+  assert_scp(ssh_scp_write(scp, RAW(data), Rf_xlength(data)), "ssh_scp_write", scp, ssh);
   ssh_scp_close(scp);
   ssh_scp_free(scp);
   return path;
