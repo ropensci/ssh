@@ -44,13 +44,17 @@ static SEXP stream_to_r(ssh_scp scp){
   unsigned char * ptr = RAW(out);
   size_t read_bytes = 0;
   do {
+    if(pending_interrupt()){
+      ssh_scp_deny_request(scp, "user interrupt");
+      return NULL;
+    }
     read_bytes = ssh_scp_read(scp, ptr, size);
     ptr += read_bytes;
     size -= read_bytes;
+    //REprintf("\r Remaining: %lld bytes", size);
   } while(size != 0);
   return out;
 }
-
 
 /* Retrieve file from remote host */
 SEXP C_scp_read_file(SEXP ptr, SEXP path){
@@ -83,6 +87,7 @@ SEXP C_scp_write_file(SEXP ptr, SEXP path, SEXP data){
 }
 
 static void call_cb(SEXP data, SEXP cb, char * pwd[1000], int depth){
+  //REprintf("Running call_cb\n");
   PROTECT(data);
   SEXP dir = PROTECT(dirvec_to_r(pwd, depth + 1));
   SEXP call = PROTECT(Rf_lcons(cb, Rf_lcons(data, Rf_lcons(dir, R_NilValue))));
@@ -102,7 +107,10 @@ SEXP C_scp_download_recursive(SEXP ptr, SEXP path, SEXP cb){
     case SSH_SCP_REQUEST_NEWFILE:
       assert_scp(ssh_scp_accept_request(scp), "ssh_scp_accept_request", scp, ssh);
       pwd[depth] = strdup(ssh_scp_request_get_filename(scp));
-      call_cb(stream_to_r(scp), cb, pwd, depth);
+      SEXP data = stream_to_r(scp);
+      if(data == NULL)
+        goto cleanup;
+      call_cb(data, cb, pwd, depth);
       free(pwd[depth]);
       break;
     case SSH_SCP_REQUEST_NEWDIR:
