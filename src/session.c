@@ -143,10 +143,30 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   size_t hlen = 0;
   assert_ssh(myssh_get_publickey(ssh, &key), "myssh_get_publickey", ssh);
   assert_ssh(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
+#if LIBSSH_VERSION_MINOR < 8
   if(!ssh_is_server_known(ssh)){
-    Rprintf("New server fingerprint: %s\n", ssh_get_hexa(hash, hlen));
-    ssh_write_knownhost(ssh);
+    Rprintf("Server fingerprint: %s\n", ssh_get_hexa(hash, hlen));
   }
+#else
+  switch(ssh_session_is_known_server(ssh)){
+  case SSH_KNOWN_HOSTS_OK:
+    REprintf("Found known server key: %s\n", ssh_get_hexa(hash, hlen));
+    break;
+  case SSH_KNOWN_HOSTS_UNKNOWN:
+    REprintf("New server key: %s\n", ssh_get_hexa(hash, hlen));
+    ssh_session_update_known_hosts(ssh);
+    break;
+  case SSH_KNOWN_HOSTS_OTHER:
+  case SSH_KNOWN_HOSTS_CHANGED:
+    REprintf("Server key has changed (possible attack?!): %s\nPlease update your ~/.ssh/known_hosts file\n", ssh_get_hexa(hash, hlen));
+    break;
+  case SSH_KNOWN_HOSTS_ERROR:
+  case SSH_KNOWN_HOSTS_NOT_FOUND:
+    if(loglevel > 0)
+      REprintf("Could not load a known_hosts file\n");
+    break;
+  }
+#endif
 
   /* Authenticate client */
   auth_any(ssh, privkey, rpass);
