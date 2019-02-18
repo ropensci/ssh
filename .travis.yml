@@ -5,22 +5,13 @@ fortran: false
 
 matrix:
   include:
-    - dist: precise
-    - dist: trusty
-    - dist: xenial
     - os: osx
       brew_packages: libssh
-      before_install: brew upgrade libssh
+      before_install: brew upgrade libssh && cat /Users/travis/.travis/functions
     - os: osx
-      disable_homebrew: true
-    - os: osx
-      osx_image: xcode7.3
       disable_homebrew: true
 
 addons:
   apt:
     packages:
     - libssh-dev
-
-before_install:
-  - cat -n /Users/travis/.travis/functions
