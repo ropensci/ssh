@@ -22,5 +22,5 @@ addons:
     packages:
     - libssh-dev
 
-after_failure:
+before_install:
   - cat -n /Users/travis/.travis/functions
