@@ -21,3 +21,6 @@ addons:
   apt:
     packages:
     - libssh-dev
+
+after_failure:
+  - cat -n /Users/travis/.travis/functions
