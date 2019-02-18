@@ -1,5 +1,6 @@
 ---
 title: "Secure Shell (SSH) Client for R"
+date: "2019-02-18"
 output:
   html_document:
     fig_caption: false
@@ -58,20 +59,13 @@ First create an ssh session by connecting to an SSH server.
 
 ```r
 session <- ssh_connect("jeroen@dev.opencpu.org")
-```
-
-```
-Calling my_auth_callback
-```
-
-```r
 print(session)
 ```
 
 ```
 <ssh session>
 connected: jeroen@dev.opencpu.org:22
-server: 1e:28:44:af:84:91:e5:88:fe:82:ca:34:d7:c8:cf:a8:0d:2f:ec:af
+server: 1c:86:dc:b9:77:2c:74:ee:2d:00:49:6f:2e:c8:b2:61:5e:14:53:73
 ```
 
 Once established, a session is closed automatically by the garbage collector when the object goes out of scope or when R quits. You can also manually close it using `ssh_disconnect()` but this is not strictly needed.
@@ -175,13 +169,15 @@ cat(rawToChar(out$stdout))
 
 ```
 
-R version 3.4.4 (2018-03-15) -- "Someone to Lean On"
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -192,8 +188,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > rnorm(10)
- [1]  0.14301778 -0.26873489  0.83931307  0.22034917  0.87214122 -0.13655736
- [7] -0.08793867 -0.68616146  0.23469591  0.93871035
+ [1] -1.137542994  1.943188527 -0.580907029  0.287785097  0.731415081
+ [6] -1.573093754  0.474126695 -1.175578241 -0.374322099 -0.003668059
 > 
 > 
 ```
