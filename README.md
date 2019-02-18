@@ -78,7 +78,7 @@ cat(rawToChar(out$stdout))
 ```
 #### Using 'sudo'
 
-Note that the exec functions are non interactive so they cannot prompt for a sudo password. A trick is to use `-S` which reads the passord from stdin:
+Note that the exec functions are non interactive so they cannot prompt for a sudo password. A trick is to use `-S` which reads the password from stdin:
 
 ```
 out <- ssh_exec_wait(session, 'echo "mypassword!" | sudo -s -S apt-get update -y')
