@@ -98,6 +98,7 @@ static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass){
     if(privkey != NULL && ssh_userauth_publickey(ssh, NULL, privkey) == SSH_AUTH_SUCCESS)
       return;
     // ssh_userauth_publickey_auto() tries both ssh-agent and standard keys in ~/.ssh
+    // it also automatically picks up SSH_ASKPASS env var set by 'askpass' package
     if(privkey == NULL && ssh_userauth_publickey_auto(ssh, NULL, NULL) == SSH_AUTH_SUCCESS)
       return;
   }
