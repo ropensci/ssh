@@ -59,9 +59,11 @@ int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int ve
   return SSH_OK;
 }
 
-static int auth_password(ssh_session ssh, SEXP rpass){
+static int auth_password(ssh_session ssh, SEXP rpass, const char *user){
   char buf[1024];
-  password_cb(rpass, "Please enter your ssh password", buf);
+  char prompt[1024];
+  snprintf(prompt, 1023, "Please enter ssh password for user '%s'", user ? user : "???");
+  password_cb(rpass, prompt, buf);
   int rc = ssh_userauth_password(ssh, NULL, buf);
   assert_ssh(rc == SSH_AUTH_ERROR, "password auth", ssh);
   return rc;
@@ -90,7 +92,7 @@ static int auth_interactive(ssh_session ssh, SEXP rpass){
 }
 
 /* authenticate client */
-static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass){
+static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass, const char *user){
   if(ssh_userauth_none(ssh, NULL) == SSH_AUTH_SUCCESS)
     return;
   int method = ssh_userauth_list(ssh, NULL);
@@ -104,7 +106,7 @@ static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass){
   }
   if (method & SSH_AUTH_METHOD_INTERACTIVE && auth_interactive(ssh, rpass) == SSH_AUTH_SUCCESS)
     return;
-  if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass) == SSH_AUTH_SUCCESS)
+  if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass, user) == SSH_AUTH_SUCCESS)
     return;
   Rf_error("Authentication failed, permission denied");
 }
@@ -171,7 +173,7 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
 #endif
 
   /* Authenticate client */
-  auth_any(ssh, privkey, rpass);
+  auth_any(ssh, privkey, rpass, user);
 
   /* display welcome message */
   char * banner = ssh_get_issue_banner(ssh);
