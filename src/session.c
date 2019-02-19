@@ -34,20 +34,22 @@ static void assert_ssh(int rc, const char * what, ssh_session ssh){
   }
 }
 
-static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024]){
+static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024], const char *user){
   if(Rf_isString(rpass) && Rf_length(rpass)){
     strncpy(buf, CHAR(STRING_ELT(rpass, 0)), 1024);
     return Rf_length(STRING_ELT(rpass, 0));
   } else if(Rf_isFunction(rpass)){
     int err;
-    SEXP call = PROTECT(Rf_lcons(rpass, Rf_lcons(make_string(prompt), R_NilValue)));
+    SEXP question = PROTECT(make_string(prompt));
+    Rf_setAttrib(question, R_NamesSymbol, make_string(user));
+    SEXP call = PROTECT(Rf_lcons(rpass, Rf_lcons(question, R_NilValue)));
     SEXP res = PROTECT(R_tryEval(call, R_GlobalEnv, &err));
     if(err || !Rf_isString(res)){
-      UNPROTECT(2);
+      UNPROTECT(3);
       Rf_error("Password callback did not return a string value");
     }
     strncpy(buf, CHAR(STRING_ELT(res, 0)), 1024);
-    UNPROTECT(2);
+    UNPROTECT(3);
     return strlen(buf);
   }
   Rf_errorcall(R_NilValue, "unsupported password type");
@@ -55,7 +57,7 @@ static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024]){
 
 int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int verify, void *userdata){
   SEXP rpass = (SEXP) userdata;
-  password_cb(rpass, prompt, buf);
+  password_cb(rpass, prompt, buf, "");
   return SSH_OK;
 }
 
@@ -63,7 +65,7 @@ static int auth_password(ssh_session ssh, SEXP rpass, const char *user){
   char buf[1024];
   char prompt[1024];
   snprintf(prompt, 1023, "Please enter ssh password for user '%s'", user ? user : "???");
-  password_cb(rpass, prompt, buf);
+  password_cb(rpass, prompt, buf, user);
   int rc = ssh_userauth_password(ssh, NULL, buf);
   assert_ssh(rc == SSH_AUTH_ERROR, "password auth", ssh);
   return rc;
@@ -84,7 +86,7 @@ static int auth_interactive(ssh_session ssh, SEXP rpass, const char *user){
       const char * prompt = ssh_userauth_kbdint_getprompt(ssh, iprompt, NULL);
       char question[1024];
       snprintf(question, 1023, "Authenticating user '%s'. %s", user, prompt);
-      password_cb(rpass, question, buf);
+      password_cb(rpass, question, buf, user);
       if (ssh_userauth_kbdint_setanswer(ssh, iprompt, buf) < 0)
         return SSH_AUTH_ERROR;
     }
