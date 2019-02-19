@@ -1,7 +1,7 @@
 0.4:
   - Fix for security problem with latest openssh-server
   - Windows/Mac: update libssh to 0.8.6
-  - Use new 'askpass' package which automatically sets SSH_ASKPASS
+  - Use new 'askpass' package for password and passphrase prompts
   - Use new ssh_session_is_known_server() api on libssh 0.8 and up
   - Fix bug that would write key to known_hosts for each connection
   - Add support for parsing ipv6 ip-address
