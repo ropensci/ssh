@@ -69,7 +69,7 @@ static int auth_password(ssh_session ssh, SEXP rpass, const char *user){
   return rc;
 }
 
-static int auth_interactive(ssh_session ssh, SEXP rpass){
+static int auth_interactive(ssh_session ssh, SEXP rpass, const char *user){
   int rc = ssh_userauth_kbdint(ssh, NULL, NULL);
   while (rc == SSH_AUTH_INFO) {
     const char * name = ssh_userauth_kbdint_getname(ssh);
@@ -82,7 +82,9 @@ static int auth_interactive(ssh_session ssh, SEXP rpass){
     for (int iprompt = 0; iprompt < nprompts; iprompt++) {
       char buf[1024];
       const char * prompt = ssh_userauth_kbdint_getprompt(ssh, iprompt, NULL);
-      password_cb(rpass, prompt, buf);
+      char question[1024];
+      snprintf(question, 1023, "Authenticating user '%s'. %s", user, prompt);
+      password_cb(rpass, question, buf);
       if (ssh_userauth_kbdint_setanswer(ssh, iprompt, buf) < 0)
         return SSH_AUTH_ERROR;
     }
@@ -104,7 +106,7 @@ static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass, const char *u
     if(privkey == NULL && ssh_userauth_publickey_auto(ssh, NULL, NULL) == SSH_AUTH_SUCCESS)
       return;
   }
-  if (method & SSH_AUTH_METHOD_INTERACTIVE && auth_interactive(ssh, rpass) == SSH_AUTH_SUCCESS)
+  if (method & SSH_AUTH_METHOD_INTERACTIVE && auth_interactive(ssh, rpass, user) == SSH_AUTH_SUCCESS)
     return;
   if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass, user) == SSH_AUTH_SUCCESS)
     return;
