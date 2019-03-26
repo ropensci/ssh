@@ -107,7 +107,6 @@ Tools for setting up and debugging your ssh keys are provided via the [`credenti
 
 
 ```r
-library(credentials)
 ssh_key_info()
 ```
 
@@ -204,8 +203,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > rnorm(10)
- [1] -0.3225000  0.1498681  0.8766819  0.5437534 -0.3844489 -0.1025856
- [7]  0.2958536  0.6892032  0.8147570  0.1385078
+ [1] -0.4657579  0.1628843 -1.8308908 -1.4333284 -1.6689843 -0.3603318
+ [7] -0.3299621 -0.2162147  1.0788035 -0.9536821
 > 
 > 
 ```

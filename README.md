@@ -20,10 +20,10 @@ install.packages('ssh')
 Alternatively it can be installed from source using `devtools`:
 
 ```r
-devtools::install_github('ropensci/ssh')
+remotes::install_github('ropensci/ssh')
 ```
 
-Installation from source on MacOS or Linux requires [`libssh`](https://www.libssh.org/) (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
+Installation from source on MacOS or Linux requires [`libssh`](https://www.libssh.org/) (the original `libssh`, __not__ the unrelated `libssh2` library). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
 
 ```
 sudo apt-get install -y libssh-dev
@@ -112,4 +112,15 @@ ssh_tunnel(session, port = 5555,target = "ds043942.mongolab.com:43942")
 ```
 
 This function blocks while the tunnel is active. Use the tunnel by connecting to `localhost:5555` from a separate process. The tunnel can only be used once and will automatically be closed when the client disconnects.
+
+### Disconnect
+
+
+When you are done with the session you should disconnect:
+
+```{r}
+ssh_disconnect(session)
+```
+
+If you forgot to disconnect, the garbage collector will do so for you (with a warning).
 

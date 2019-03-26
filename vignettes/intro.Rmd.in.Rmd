@@ -111,7 +111,6 @@ ssh_userauth_publickey_auto: Successfully authenticated using /Users/jeroen/.ssh
 Tools for setting up and debugging your ssh keys are provided via the [`credentials` package](http://bit.ly/2UaiYbo).
 
 ```{r}
-library(credentials)
 ssh_key_info()
 ```
 
