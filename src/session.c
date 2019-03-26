@@ -34,9 +34,9 @@ static void assert_ssh(int rc, const char * what, ssh_session ssh){
   }
 }
 
-static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024], const char *user){
+static size_t password_cb(SEXP rpass, const char * prompt, char *buf, int buflen, const char *user){
   if(Rf_isString(rpass) && Rf_length(rpass)){
-    strncpy(buf, CHAR(STRING_ELT(rpass, 0)), 1024);
+    strncpy(buf, CHAR(STRING_ELT(rpass, 0)), buflen);
     return Rf_length(STRING_ELT(rpass, 0));
   } else if(Rf_isFunction(rpass)){
     int err;
@@ -48,7 +48,7 @@ static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024], const
       UNPROTECT(3);
       Rf_error("Password callback did not return a string value");
     }
-    strncpy(buf, CHAR(STRING_ELT(res, 0)), 1024);
+    strncpy(buf, CHAR(STRING_ELT(res, 0)), buflen);
     UNPROTECT(3);
     return strlen(buf);
   }
@@ -57,7 +57,7 @@ static size_t password_cb(SEXP rpass, const char * prompt, char buf[1024], const
 
 int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int verify, void *userdata){
   SEXP rpass = (SEXP) userdata;
-  password_cb(rpass, prompt, buf, "");
+  password_cb(rpass, prompt, buf, len, "");
   return SSH_OK;
 }
 
@@ -65,7 +65,7 @@ static int auth_password(ssh_session ssh, SEXP rpass, const char *user){
   char buf[1024];
   char prompt[1024];
   snprintf(prompt, 1023, "Please enter ssh password for user '%s'", user ? user : "???");
-  password_cb(rpass, prompt, buf, user);
+  password_cb(rpass, prompt, buf, 1024, user);
   int rc = ssh_userauth_password(ssh, NULL, buf);
   assert_ssh(rc == SSH_AUTH_ERROR, "password auth", ssh);
   return rc;
@@ -86,7 +86,7 @@ static int auth_interactive(ssh_session ssh, SEXP rpass, const char *user){
       const char * prompt = ssh_userauth_kbdint_getprompt(ssh, iprompt, NULL);
       char question[1024];
       snprintf(question, 1023, "Authenticating user '%s'. %s", user, prompt);
-      password_cb(rpass, question, buf, user);
+      password_cb(rpass, question, buf, 1024, user);
       if (ssh_userauth_kbdint_setanswer(ssh, iprompt, buf) < 0)
         return SSH_AUTH_ERROR;
     }
