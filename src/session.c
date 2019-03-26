@@ -164,7 +164,8 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
 #else
   switch(ssh_session_is_known_server(ssh)){
   case SSH_KNOWN_HOSTS_OK:
-    REprintf("Found known server key: %s\n", ssh_get_hexa(hash, hlen));
+    if(loglevel > 0)
+      REprintf("Found known server key: %s\n", ssh_get_hexa(hash, hlen));
     break;
   case SSH_KNOWN_HOSTS_UNKNOWN:
     REprintf("New server key: %s\n", ssh_get_hexa(hash, hlen));

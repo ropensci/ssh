@@ -1,4 +1,4 @@
-context("scp")
+context("ssh-scp")
 
 ssh <- ssh_connect('dev.opencpu.org')
 
