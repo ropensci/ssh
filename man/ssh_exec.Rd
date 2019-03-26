@@ -45,7 +45,7 @@ ssh_exec_wait(session, command = c(
 ))}
 }
 \seealso{
-Other ssh: \code{\link{credentials}}, \code{\link{scp}},
-  \code{\link{ssh_connect}}, \code{\link{ssh_tunnel}}
+Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
+  \code{\link{ssh_credentials}}, \code{\link{ssh_tunnel}}
 }
 \concept{ssh}
