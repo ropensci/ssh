@@ -40,6 +40,8 @@ static size_t password_cb(SEXP rpass, const char * prompt, char *buf, int buflen
     return Rf_length(STRING_ELT(rpass, 0));
   } else if(Rf_isFunction(rpass)){
     int err;
+    if(strcmp(prompt, "Passphrase") == 0)
+      prompt = "Passphrase for reading private key";
     SEXP question = PROTECT(make_string(prompt));
     Rf_setAttrib(question, R_NamesSymbol, make_string(user));
     SEXP call = PROTECT(Rf_lcons(rpass, Rf_lcons(question, R_NilValue)));
