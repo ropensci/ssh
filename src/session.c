@@ -59,7 +59,7 @@ static int password_cb(SEXP rpass, const char * prompt, char *buf, int buflen, c
   return -1;
 }
 
-int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int verify, void *userdata){
+static int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int verify, void *userdata){
   SEXP rpass = (SEXP) userdata;
   return password_cb(rpass, prompt, buf, len, "") > 0 ? SSH_OK : SSH_ERROR;
 }

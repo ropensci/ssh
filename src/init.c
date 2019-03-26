@@ -5,7 +5,7 @@
 #include <R_ext/Rdynload.h>
 #include <libssh/callbacks.h>
 
-void log_cb(int priority, const char *function, const char *buffer, void *userdata){
+static void log_cb(int priority, const char *function, const char *buffer, void *userdata){
   REprintf("%s\n", buffer);
 }
 

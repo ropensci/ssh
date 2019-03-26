@@ -19,17 +19,17 @@
 #ifdef _WIN32
 #define NONBLOCK_OK (WSAGetLastError() == WSAEWOULDBLOCK)
 #define SHUTDOWN_SIGNAL SD_BOTH
-void set_nonblocking(int sockfd){
+static void set_nonblocking(int sockfd){
   u_long nonblocking = 1;
   ioctlsocket(sockfd, FIONBIO, &nonblocking);
 }
 
-void set_blocking(int sockfd){
+static void set_blocking(int sockfd){
   u_long nonblocking = 0;
   ioctlsocket(sockfd, FIONBIO, &nonblocking);
 }
 
-const char *formatError(DWORD res){
+static const char *formatError(DWORD res){
   static char buf[1000], *p;
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                 NULL, res,
@@ -47,12 +47,12 @@ const char *formatError(DWORD res){
 #else
 #define NONBLOCK_OK (errno == EAGAIN || errno == EWOULDBLOCK)
 #define SHUTDOWN_SIGNAL SHUT_RDWR
-void set_nonblocking(int sockfd){
+static void set_nonblocking(int sockfd){
   long arg = fcntl(sockfd, F_GETFL, NULL);
   arg |= O_NONBLOCK;
   fcntl(sockfd, F_SETFL, arg);
 }
-void set_blocking(int sockfd){
+static void set_blocking(int sockfd){
   long arg = fcntl(sockfd, F_GETFL, NULL);
   arg &= ~O_NONBLOCK;
   fcntl(sockfd, F_SETFL, arg);
@@ -61,7 +61,7 @@ void set_blocking(int sockfd){
 #endif
 
 /* Check for interrupt without long jumping */
-void check_interrupt_fn(void *dummy) {
+static void check_interrupt_fn(void *dummy) {
   R_ProcessEvents();
   R_CheckUserInterrupt();
 }
@@ -71,12 +71,12 @@ int pending_interrupt() {
 }
 
 /* check for system errors */
-void syserror_if(int err, const char * what){
+static void syserror_if(int err, const char * what){
   if(err && !NONBLOCK_OK)
     Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, getsyserror());
 }
 
-char spinner(){
+static char spinner(){
   static int x;
   x = (x + 1) % 4;
   switch(x){
@@ -96,7 +96,7 @@ static void print_progress(int add){
 }
 
 /* Wait for descriptor */
-int wait_for_fd(int fd, int port){
+static int wait_for_fd(int fd, int port){
   int waitms = 200;
   struct timeval tv;
   tv.tv_sec = 0;
@@ -115,7 +115,7 @@ int wait_for_fd(int fd, int port){
   return active;
 }
 
-int open_port(int port){
+static int open_port(int port){
 
   // define server socket
   struct sockaddr_in serv_addr;
@@ -140,7 +140,7 @@ int open_port(int port){
   return listenfd;
 }
 
-void host_tunnel(ssh_channel tunnel, int connfd){
+static void host_tunnel(ssh_channel tunnel, int connfd){
   char buf[16384];
 
   //assume connfd is non-blocking
@@ -185,7 +185,7 @@ void host_tunnel(ssh_channel tunnel, int connfd){
   close(connfd);
 }
 
-void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
+static void open_tunnel(ssh_session ssh, int port, const char * outhost, int outport){
   int listenfd = open_port(port);
   if(wait_for_fd(listenfd, port) == 0)
     goto cleanup;
