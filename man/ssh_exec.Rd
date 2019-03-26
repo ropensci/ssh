@@ -42,7 +42,8 @@ ssh_exec_wait(session, command = c(
   'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
   'R CMD check jsonlite_1.5.tar.gz',
   'rm -f jsonlite_1.5.tar.gz'
-))}
+))
+ssh_disconnect(session)}
 }
 \seealso{
 Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},

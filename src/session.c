@@ -4,6 +4,8 @@ ssh_session ssh_ptr_get(SEXP ptr){
   ssh_session ssh = (ssh_session) R_ExternalPtrAddr(ptr);
   if(ssh == NULL)
     Rf_error("SSH session pointer is dead");
+  if(!ssh_is_connected(ssh))
+    Rf_error("ssh session has been disconnected");
   return ssh;
 }
 
@@ -11,7 +13,10 @@ static void ssh_ptr_fin(SEXP ptr){
   ssh_session ssh = (ssh_session) R_ExternalPtrAddr(ptr);
   if(ssh == NULL)
     return;
-  ssh_disconnect(ssh);
+  if(ssh_is_connected(ssh)){
+    Rf_warningcall(R_NilValue, "Disconnecting from unused ssh session. Please use ssh_disconnect()\n");
+    ssh_disconnect(ssh);
+  }
   ssh_free(ssh);
   R_ClearExternalPtr(ptr);
 }
@@ -24,12 +29,11 @@ static SEXP ssh_ptr_create(ssh_session ssh){
   return ptr;
 }
 
-static void assert_ssh(int rc, const char * what, ssh_session ssh){
+static void assert_or_disconnect(int rc, const char * what, ssh_session ssh){
   if (rc != SSH_OK){
     char buf[1024];
     strncpy(buf, ssh_get_error(ssh), 1023);
     ssh_disconnect(ssh);
-    ssh_free(ssh);
     Rf_errorcall(R_NilValue, "libssh failure at '%s': %s", what, buf);
   }
 }
@@ -96,7 +100,7 @@ static int auth_interactive(ssh_session ssh, SEXP rpass, const char *user){
 }
 
 /* authenticate client */
-static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass, const char *user){
+static void auth_or_disconnect(ssh_session ssh, ssh_key privkey, SEXP rpass, const char *user){
   if(ssh_userauth_none(ssh, NULL) == SSH_AUTH_SUCCESS)
     return;
   int method = ssh_userauth_list(ssh, NULL);
@@ -112,7 +116,8 @@ static void auth_any(ssh_session ssh, ssh_key privkey, SEXP rpass, const char *u
     return;
   if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass, user) == SSH_AUTH_SUCCESS)
     return;
-  Rf_error("Authentication failed, permission denied");
+  ssh_disconnect(ssh);
+  Rf_errorcall(R_NilValue, "Authentication with ssh server failed");
 }
 
 SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpass, SEXP verbosity){
@@ -129,10 +134,11 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   const char * host = CHAR(STRING_ELT(rhost, 0));
   const char * user = CHAR(STRING_ELT(ruser, 0));
   ssh_session ssh = ssh_new();
-  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_HOST, host), "set host", ssh);
-  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_USER, user), "set user", ssh);
-  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
-  assert_ssh(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &loglevel), "set verbosity", ssh);
+  SEXP ptr = PROTECT(ssh_ptr_create(ssh));
+  assert_or_disconnect(ssh_options_set(ssh, SSH_OPTIONS_HOST, host), "set host", ssh);
+  assert_or_disconnect(ssh_options_set(ssh, SSH_OPTIONS_USER, user), "set user", ssh);
+  assert_or_disconnect(ssh_options_set(ssh, SSH_OPTIONS_PORT, &port), "set port", ssh);
+  assert_or_disconnect(ssh_options_set(ssh, SSH_OPTIONS_LOG_VERBOSITY, &loglevel), "set verbosity", ssh);
 
   /* sets password callback for default private key */
   struct ssh_callbacks_struct cb = {
@@ -143,14 +149,14 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   ssh_set_callbacks(ssh, &cb);
 
   /* connect */
-  assert_ssh(ssh_connect(ssh), "connect", ssh);
+  assert_or_disconnect(ssh_connect(ssh), "connect", ssh);
 
   /* get server identity */
   ssh_key key;
   unsigned char * hash = NULL;
   size_t hlen = 0;
-  assert_ssh(myssh_get_publickey(ssh, &key), "myssh_get_publickey", ssh);
-  assert_ssh(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
+  assert_or_disconnect(myssh_get_publickey(ssh, &key), "myssh_get_publickey", ssh);
+  assert_or_disconnect(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
 #if LIBSSH_VERSION_MINOR < 8
   if(!ssh_is_server_known(ssh)){
     Rprintf("Server fingerprint: %s\n", ssh_get_hexa(hash, hlen));
@@ -176,8 +182,8 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
   }
 #endif
 
-  /* Authenticate client */
-  auth_any(ssh, privkey, rpass, user);
+  /* Authenticate client or error */
+  auth_or_disconnect(ssh, privkey, rpass, user);
 
   /* display welcome message */
   char * banner = ssh_get_issue_banner(ssh);
@@ -186,7 +192,8 @@ SEXP C_start_session(SEXP rhost, SEXP rport, SEXP ruser, SEXP keyfile, SEXP rpas
     free(banner);
   }
 
-  return ssh_ptr_create(ssh);
+  UNPROTECT(1);
+  return ptr;
 }
 
 SEXP C_ssh_info(SEXP ptr){
@@ -205,8 +212,8 @@ SEXP C_ssh_info(SEXP ptr){
   ssh_key key;
   unsigned char * hash = NULL;
   size_t hlen = 0;
-  assert_ssh(myssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
-  assert_ssh(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
+  assert_or_disconnect(myssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
+  assert_or_disconnect(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
 
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 6));
   SET_VECTOR_ELT(out, 0, make_string(user));
@@ -224,7 +231,7 @@ SEXP C_ssh_info(SEXP ptr){
 }
 
 SEXP C_disconnect_session(SEXP ptr){
-  ssh_ptr_fin(ptr);
+  ssh_disconnect(ssh_ptr_get(ptr));
   return R_NilValue;
 }
 

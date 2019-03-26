@@ -37,6 +37,7 @@
 #'
 #' # delete it from the server
 #' ssh_exec_wait(session, command = "rm -Rf ~/target")
+#' ssh_disconnect(session)
 #' }
 scp_download <- function(session, files, to = ".", verbose = TRUE){
   assert_session(session)

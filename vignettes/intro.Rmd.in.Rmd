@@ -199,3 +199,13 @@ ssh_tunnel(session, port = 5555, target = "ds043942.mongolab.com:43942")
 
 This function blocks while the tunnel is active. Use the tunnel by connecting to `localhost:5555` from a separate process. The tunnel can only be used once and will automatically be closed when the client disconnects.
 
+## Disconnecting
+
+When you are done with the session you should disconnect:
+
+```{r}
+ssh_disconnect(session)
+```
+
+If you forgot to disconnect, the garbage collector will do so for you (with a warning).
+

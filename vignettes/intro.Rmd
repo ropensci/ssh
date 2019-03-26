@@ -204,8 +204,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > rnorm(10)
- [1]  0.5470512  0.4673060  1.4772265 -0.1237604  1.1936938  0.7001991
- [7]  0.7220060  0.7218953 -0.1403531 -1.9208082
+ [1] -0.3225000  0.1498681  0.8766819  0.5437534 -0.3844489 -0.1025856
+ [7]  0.2958536  0.6892032  0.8147570  0.1385078
 > 
 > 
 ```
@@ -249,4 +249,15 @@ ssh_tunnel(session, port = 5555, target = "ds043942.mongolab.com:43942")
 ```
 
 This function blocks while the tunnel is active. Use the tunnel by connecting to `localhost:5555` from a separate process. The tunnel can only be used once and will automatically be closed when the client disconnects.
+
+## Disconnecting
+
+When you are done with the session you should disconnect:
+
+
+```r
+ssh_disconnect(session)
+```
+
+If you forgot to disconnect, the garbage collector will do so for you (with a warning).
 

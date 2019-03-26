@@ -1,6 +1,8 @@
 0.5
   - Refactor password callback to avoid jumping on error
   - Fix a bug with reading the new openssh pem keys
+  - Disconnect session immediately on startup/authentication errors
+  - Raise a warning when the GC collects an ssh session which is still connected.
 
 0.4:
   - Fix for security problem with latest openssh-server
