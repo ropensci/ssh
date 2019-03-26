@@ -56,7 +56,7 @@ ssh_disconnect(session)
 }
 }
 \seealso{
-Other ssh: \code{\link{scp}}, \code{\link{ssh_exec}},
-  \code{\link{ssh_tunnel}}
+Other ssh: \code{\link{credentials}}, \code{\link{scp}},
+  \code{\link{ssh_exec}}, \code{\link{ssh_tunnel}}
 }
 \concept{ssh}

@@ -25,7 +25,7 @@ automatically be closed when the client disconnects. It is intended to tunnel a 
 connection, not as a long running proxy server.
 }
 \seealso{
-Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
-  \code{\link{ssh_exec}}
+Other ssh: \code{\link{credentials}}, \code{\link{scp}},
+  \code{\link{ssh_connect}}, \code{\link{ssh_exec}}
 }
 \concept{ssh}
