@@ -49,28 +49,26 @@ static int password_cb(SEXP rpass, const char * prompt, char *buf, int buflen, c
     if(err || !Rf_isString(res)){
       UNPROTECT(3);
       REprintf("Password callback did not return a string value\n");
-      return -1;
+      return SSH_ERROR;
     }
     strncpy(buf, CHAR(STRING_ELT(res, 0)), buflen);
     UNPROTECT(3);
-    return strlen(buf);
+    return SSH_OK;
   }
   REprintf("unsupported password type\n");
-  return -1;
+  return SSH_ERROR;
 }
 
 static int my_auth_callback(const char *prompt, char *buf, size_t len, int echo, int verify, void *userdata){
   SEXP rpass = (SEXP) userdata;
-  return password_cb(rpass, prompt, buf, len, "") > 0 ? SSH_OK : SSH_ERROR;
+  return password_cb(rpass, prompt, buf, len, "");
 }
 
 static int auth_password(ssh_session ssh, SEXP rpass, const char *user){
   char buf[1024];
   char prompt[1024];
   snprintf(prompt, 1023, "Please enter ssh password for user '%s'", user ? user : "???");
-  if(password_cb(rpass, prompt, buf, 1024, user) > 0)
-    return ssh_userauth_password(ssh, NULL, buf);
-  return SSH_ERROR;
+  return password_cb(rpass, prompt, buf, 1024, user);
 }
 
 static int auth_interactive(ssh_session ssh, SEXP rpass, const char *user){
