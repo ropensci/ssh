@@ -68,11 +68,11 @@ static int my_auth_callback(const char *prompt, char *buf, size_t len, int echo,
   return password_cb(rpass, prompt, buf, len, "");
 }
 
-static int auth_password(SEXP rpass, const char *user){
+static int auth_password(ssh_session ssh, SEXP rpass, const char *user){
   char buf[1024];
   char prompt[1024];
   snprintf(prompt, 1023, "Please enter ssh password for user '%s'", user ? user : "???");
-  return password_cb(rpass, prompt, buf, 1024, user);
+  return password_cb(rpass, prompt, buf, 1024, user) || ssh_userauth_password(ssh, NULL, buf);
 }
 
 static int auth_interactive(ssh_session ssh, SEXP rpass, const char *user){
@@ -114,7 +114,7 @@ static void auth_or_disconnect(ssh_session ssh, ssh_key privkey, SEXP rpass, con
   }
   if (method & SSH_AUTH_METHOD_INTERACTIVE && auth_interactive(ssh, rpass, user) == SSH_AUTH_SUCCESS)
     return;
-  if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(rpass, user) == SSH_AUTH_SUCCESS)
+  if (method & SSH_AUTH_METHOD_PASSWORD && auth_password(ssh, rpass, user) == SSH_AUTH_SUCCESS)
     return;
   ssh_disconnect(ssh);
   Rf_errorcall(R_NilValue, "Authentication with ssh server failed");
