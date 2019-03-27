@@ -1,4 +1,5 @@
 0.5
+  - Import key management functions from the new 'credentials' package
   - Refactor password callback to avoid jumping on error
   - Fix a bug with reading the new openssh pem keys
   - Disconnect session immediately on startup/authentication errors
