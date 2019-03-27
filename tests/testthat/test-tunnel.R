@@ -1,5 +1,9 @@
 context("ssh-tunnel")
 
+is_windows <- function(){
+  Sys.info()[["sysname"]] == "Windows"
+}
+
 test_that("Tunnel: recycle port in process",{
   # Start tunnel twice!
   pid <- sys::r_background(std_out = FALSE, std_err = FALSE, args = c("-e",
@@ -36,13 +40,14 @@ test_that("Tunnel: free port on exit", {
     out <- con$find()
     expect_equal(out, mtcars)
     con$drop()
-    if(i == 2 && Sys.info()[["sysname"]] != "Windows"){
-      # Test that process can also be interrupted
+    if(i == 2){
+      # Test that process can also be interrupted. For Windows this results in non-success.
       tools::pskill(pid, tools::SIGINT)
+      expect_equal(sys::exec_status(pid), ifelse(is_windows(), 1, 0))
     } else {
       con$disconnect()
+      expect_equal(sys::exec_status(pid), 0)
     }
-    expect_equal(sys::exec_status(pid), 0)
     expect_error(con$count())
 
     #not needed but just in case:
