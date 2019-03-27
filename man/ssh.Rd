@@ -3,6 +3,7 @@
 \name{ssh_connect}
 \alias{ssh_connect}
 \alias{ssh}
+\alias{ssh_session_info}
 \alias{ssh_info}
 \alias{ssh_disconnect}
 \alias{libssh_version}
@@ -10,7 +11,7 @@
 \usage{
 ssh_connect(host, keyfile = NULL, passwd = askpass, verbose = FALSE)
 
-ssh_info(session)
+ssh_session_info(session)
 
 ssh_disconnect(session)
 

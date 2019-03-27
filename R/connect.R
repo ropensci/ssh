@@ -46,14 +46,18 @@ ssh_connect <- function(host, keyfile = NULL, passwd = askpass, verbose = FALSE)
   .Call(C_start_session, details$host, details$port, details$user, keyfile, passwd, verbose)
 }
 
-#' @export
 #' @rdname ssh
+#' @export ssh_session_info ssh_info
+#' @aliases ssh_info
 #' @useDynLib ssh C_ssh_info
-ssh_info <- function(session){
+ssh_session_info <- function(session){
   assert_session(session)
   out <- .Call(C_ssh_info, session)
   structure(out, names = c("user", "host", "identity", "port", "connected", "sha1"))
 }
+
+# For backward compatibility
+ssh_info <- ssh_session_info
 
 #' @export
 #' @rdname ssh
@@ -112,7 +116,7 @@ assert_session <- function(x){
 
 #' @export
 print.ssh_session <- function(x, ...){
-  info <- ssh_info(x)
+  info <- ssh_session_info(x)
   cat(sprintf("<ssh session>\nconnected: %s@%s:%d\nserver: %s\n", info$user, info$host, info$port, info$sha1))
 }
 
