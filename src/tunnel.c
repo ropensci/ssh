@@ -77,7 +77,7 @@ static void syserror_if(int err, const char * what){
 }
 
 static void sys_message(const char * what){
-  REprintf("In %s: %s", what, getsyserror());
+  Rprintf("%s in %s\n", getsyserror(), what);
 }
 
 static char spinner(){
