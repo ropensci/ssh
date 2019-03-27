@@ -18,7 +18,9 @@
 ssh_tunnel <- function(session, port = 5555, target = "rainmaker.wunderground.com:23") {
   assert_session(session)
   stopifnot(is.numeric(port))
-  target <- parse_host(target)
+  target <- parse_host(target, NA)
+  if(is.na(target$port))
+    stop("No port specified in 'target'")
   .Call(C_blocking_tunnel, session, as.integer(port), target$host, target$port)
   invisible()
 }
