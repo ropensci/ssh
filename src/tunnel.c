@@ -76,6 +76,10 @@ static void syserror_if(int err, const char * what){
     Rf_errorcall(R_NilValue, "System failure for: %s (%s)", what, getsyserror());
 }
 
+static void sys_message(const char * what){
+  REprintf("In %s: %s", what, getsyserror());
+}
+
 static char spinner(){
   static int x;
   x = (x + 1) % 4;
@@ -108,7 +112,10 @@ static int wait_for_fd(int fd, int port){
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
     active = select(fd+1, &rfds, NULL, NULL, &tv);
-    syserror_if(active < 0, "select()");
+    if(active < 0){
+      sys_message("select()");
+      return 0;
+    }
     if(active || pending_interrupt())
       break;
   }

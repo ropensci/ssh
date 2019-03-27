@@ -4,6 +4,7 @@
   - Disconnect session immediately on startup/authentication errors
   - Raise a warning when the GC collects an ssh session which is still connected.
   - Rename ssh_info() to ssh_session_info()
+  - ssh_tunnel() now closes listen port when interrupted while waiting
 
 0.4:
   - Fix for security problem with latest openssh-server
