@@ -64,7 +64,7 @@ Run a command or script on the host while streaming stdout and stderr directly t
 
 ```r
 ssh_exec_wait(session, command = c(
-  'curl -O https://cran.r-project.org/src/contrib/jsonlite_1.5.tar.gz',
+  'curl -fOL https://cloud.r-project.org/src/contrib/Archive/jsonlite/jsonlite_1.5.tar.gz',
   'R CMD check jsonlite_1.5.tar.gz',
   'rm -f jsonlite_1.5.tar.gz'
 ))
