@@ -1,3 +1,6 @@
+0.6
+  - Bugfix release: fix hardcoded string passwords
+
 0.5
   - Import key management functions from the new 'credentials' package
   - Refactor password callback to avoid jumping on error
