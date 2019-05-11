@@ -118,7 +118,7 @@ This function blocks while the tunnel is active. Use the tunnel by connecting to
 
 When you are done with the session you should disconnect:
 
-```{r}
+```r
 ssh_disconnect(session)
 ```
 

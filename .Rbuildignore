@@ -3,5 +3,6 @@
 ^src/Makevars$
 \.yml$
 ^windows
+\.Rmdin$
 \.in\.Rmd$
 README.md$
