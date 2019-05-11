@@ -52,7 +52,7 @@ brew install libssh
 
 First create an ssh session by connecting to an SSH server. You can either use private key or passphrase authentication: 
 
-```r
+```{r}
 session <- ssh_connect("jeroen@dev.opencpu.org")
 ```
 
@@ -62,7 +62,7 @@ You can use the session in subsequent ssh functions below.
 
 Run a command or script on the host while streaming stdout and stderr directly to the client.
 
-```r
+```{r}
 ssh_exec_wait(session, command = c(
   'curl -fOL https://cloud.r-project.org/src/contrib/Archive/jsonlite/jsonlite_1.5.tar.gz',
   'R CMD check jsonlite_1.5.tar.gz',
