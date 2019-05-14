@@ -123,4 +123,3 @@ ssh_disconnect(session)
 ```
 
 If you forgot to disconnect, the garbage collector will do so for you (with a warning).
-
