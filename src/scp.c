@@ -183,7 +183,7 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP sources, SEXP sizes, SEXP paths, SEXP 
 
     //write file to channel
     int read = 0;
-    int total = 0;
+    long long total = 0;
     char buf[16384];
     FILE *fp = fopen(CHAR(STRING_ELT(sources, i)), "rb");
     if(!fp)
