@@ -43,7 +43,7 @@ ssh_exec_wait <- function(session, command = "whoami", std_out = stdout(), std_e
   std_err <- if(isTRUE(std_err) || identical(std_err, "")){
     stderr()
   } else if(is.character(std_err)){
-    std_err <- file(normalizePath(std_err, mustWork = FALSE))
+    file(normalizePath(std_err, mustWork = FALSE))
   } else std_err
 
   outfun <- if(inherits(std_out, "connection")){
@@ -62,6 +62,10 @@ ssh_exec_wait <- function(session, command = "whoami", std_out = stdout(), std_e
         flush(std_out)
       }
     }
+  } else if(is.function(std_out)){
+    if(!length(formals(std_out)))
+      stop("Callback function std_out must have at least one parameter")
+    std_out
   }
   errfun <- if(inherits(std_err, "connection")){
     if(!isOpen(std_err)){
@@ -79,6 +83,10 @@ ssh_exec_wait <- function(session, command = "whoami", std_out = stdout(), std_e
         flush(std_err)
       }
     }
+  } else if(is.function(std_err)){
+    if(!length(formals(std_err)))
+      stop("Callback function std_err must have at least one parameter")
+    std_err
   }
   status <- .Call(C_ssh_exec, session, command, outfun, errfun)
   if(is.na(status))
