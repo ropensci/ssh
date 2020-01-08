@@ -70,7 +70,7 @@ scp_upload <- function(session, files, to = ".", verbose = TRUE){
 
 list_all <- function(files, hidden = FALSE){
   dfs <- lapply(files, function(path){
-    if(!file.exists(path))
+    if(!file.exists(path) & !dir.exists(path))
       stop(sprintf("File or directory does not exist: %s", path))
     if(file.info(path)$isdir){
       rel <- list.files(path, recursive = TRUE, all.files = hidden, include.dirs = TRUE)
