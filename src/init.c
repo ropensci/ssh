@@ -3,6 +3,7 @@
 
 #include <Rinternals.h>
 #include <R_ext/Rdynload.h>
+#include <R_ext/Visibility.h>
 #include <libssh/callbacks.h>
 
 /* .Call calls */
@@ -41,7 +42,7 @@ static void log_cb(int priority, const char *function, const char *buffer, void 
   REprintf("%s\n", buffer);
 }
 
-void R_init_ssh(DllInfo* dll) {
+attribute_visible void R_init_ssh(DllInfo* dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   ssh_init();
