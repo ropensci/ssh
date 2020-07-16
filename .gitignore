@@ -8,3 +8,4 @@ src/*.dll
 src/*.a
 src/Makevars
 windows
+configure.log
