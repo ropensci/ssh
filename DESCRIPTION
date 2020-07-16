@@ -1,7 +1,7 @@
 Package: ssh
 Type: Package
 Title: Secure Shell (SSH) Client for R
-Version: 0.6.9000
+Version: 0.7.0
 Authors@R: person("Jeroen", "Ooms", role = c("aut", "cre"), 
     email = "jeroen@berkeley.edu", comment = c(ORCID = "0000-0002-4035-0289"))
 Description: Connect to a remote server over SSH to transfer files via SCP, 

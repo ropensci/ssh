@@ -1,3 +1,8 @@
+0.7.0
+  - Allow for @ in usernames in host spec
+  - Print libssh version during CMD check
+  - Bug fixes and maintenance thingies
+
 0.6
   - Bugfix release: fix hardcoded string passwords
 
