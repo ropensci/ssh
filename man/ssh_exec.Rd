@@ -6,8 +6,12 @@
 \alias{ssh_exec_internal}
 \title{Execute Remote Command}
 \usage{
-ssh_exec_wait(session, command = "whoami", std_out = stdout(),
-  std_err = stderr())
+ssh_exec_wait(
+  session,
+  command = "whoami",
+  std_out = stdout(),
+  std_err = stderr()
+)
 
 ssh_exec_internal(session, command = "whoami", error = TRUE)
 }
@@ -27,11 +31,11 @@ Run a command or script on the host while streaming stdout and stderr directly
 to the client.
 }
 \details{
-The \code{\link[=ssh_exec_wait]{ssh_exec_wait()}} function is the remote equivalent of the local \code{\link[sys:exec_wait]{sys::exec_wait()}}.
+The \code{\link[=ssh_exec_wait]{ssh_exec_wait()}} function is the remote equivalent of the local \code{\link[sys:exec]{sys::exec_wait()}}.
 It runs a command or script on the ssh server and streams stdout and stderr to the client
 to a file or connection. When done it returns the exit status for the remotely executed command.
 
-Similarly \code{\link[=ssh_exec_internal]{ssh_exec_internal()}} is a small wrapper analogous to \code{\link[sys:exec_internal]{sys::exec_internal()}}.
+Similarly \code{\link[=ssh_exec_internal]{ssh_exec_internal()}} is a small wrapper analogous to \code{\link[sys:exec]{sys::exec_internal()}}.
 It buffers all stdout and stderr output into a raw vector and returns it in a list along with
 the exit status. By default this function raises an error if the remote command was unsuccessful.
 }
@@ -46,7 +50,10 @@ ssh_exec_wait(session, command = c(
 ssh_disconnect(session)}
 }
 \seealso{
-Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
-  \code{\link{ssh_credentials}}, \code{\link{ssh_tunnel}}
+Other ssh: 
+\code{\link{scp}},
+\code{\link{ssh_connect}()},
+\code{\link{ssh_credentials}},
+\code{\link{ssh_tunnel}()}
 }
 \concept{ssh}

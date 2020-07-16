@@ -11,8 +11,11 @@
 \alias{ssh_agent_add}
 \title{Managing Your SSH Key}
 \seealso{
-Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
-  \code{\link{ssh_exec}}, \code{\link{ssh_tunnel}}
+Other ssh: 
+\code{\link{scp}},
+\code{\link{ssh_connect}()},
+\code{\link{ssh_exec}},
+\code{\link{ssh_tunnel}()}
 }
 \concept{ssh}
 \keyword{internal}
@@ -21,6 +24,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{credentials}{\code{\link[credentials]{ssh_key_info}}, \code{\link[credentials]{ssh_keygen}}, \code{\link[credentials]{ssh_read_key}}, \code{\link[credentials]{ssh_home}}, \code{\link[credentials]{ssh_agent_add}}}
+  \item{credentials}{\code{\link[credentials:ssh_credentials]{ssh_agent_add}}, \code{\link[credentials:ssh_credentials]{ssh_home}}, \code{\link[credentials:ssh_credentials]{ssh_key_info}}, \code{\link[credentials:ssh_credentials]{ssh_keygen}}, \code{\link[credentials:ssh_credentials]{ssh_read_key}}}
 }}
 

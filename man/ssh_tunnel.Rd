@@ -4,8 +4,7 @@
 \alias{ssh_tunnel}
 \title{Create SSH tunnel}
 \usage{
-ssh_tunnel(session, port = 5555,
-  target = "rainmaker.wunderground.com:23")
+ssh_tunnel(session, port = 5555, target = "rainmaker.wunderground.com:23")
 }
 \arguments{
 \item{session}{ssh connection created with \code{\link[=ssh_connect]{ssh_connect()}}}
@@ -25,7 +24,10 @@ automatically be closed when the client disconnects. It is intended to tunnel a 
 connection, not as a long running proxy server.
 }
 \seealso{
-Other ssh: \code{\link{scp}}, \code{\link{ssh_connect}},
-  \code{\link{ssh_credentials}}, \code{\link{ssh_exec}}
+Other ssh: 
+\code{\link{scp}},
+\code{\link{ssh_connect}()},
+\code{\link{ssh_credentials}},
+\code{\link{ssh_exec}}
 }
 \concept{ssh}

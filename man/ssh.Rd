@@ -18,8 +18,8 @@ ssh_disconnect(session)
 libssh_version()
 }
 \arguments{
-\item{host}{an ssh server string of the form \code{[user@]hostname[:@port]}. An ipv6
-hostname should be wrapped in brackets like this: \code{[2001:db8::1]:80}.}
+\item{host}{an ssh server string of the form \verb{[user@]hostname[:@port]}. An ipv6
+hostname should be wrapped in brackets like this: \verb{[2001:db8::1]:80}.}
 
 \item{keyfile}{path to private key file. Must be in OpenSSH format (see details)}
 
@@ -36,7 +36,7 @@ commands, scp files or setup a tunnel.
 }
 \details{
 The client first tries to authenticate using a private key, either from ssh-agent
-or \code{/.ssh/id_rsa} in the user home directory. If this fails it falls back on
+or \verb{/.ssh/id_rsa} in the user home directory. If this fails it falls back on
 challenge-response (interactive) and password auth if allowed by the server. The
 \code{passwd} parameter can be used to provide a passphrase or a callback function to
 ask prompt the user for the passphrase when needed.
@@ -45,7 +45,7 @@ The session will automatically be disconnected when the session object is remove
 or when R exits but you can also use \code{\link[=ssh_disconnect]{ssh_disconnect()}}.
 
 \strong{Windows users:} the private key must be in OpenSSH PEM format. If you open it in
-a text editor the first line must be: \code{-----BEGIN RSA PRIVATE KEY-----}.
+a text editor the first line must be: \verb{-----BEGIN RSA PRIVATE KEY-----}.
 To convert a Putty PKK key, open it in the \emph{PuttyGen} utility and go to
 \emph{Conversions -> Export OpenSSH}.
 }
@@ -57,8 +57,10 @@ ssh_disconnect(session)
 }
 }
 \seealso{
-Other ssh: \code{\link{scp}},
-  \code{\link{ssh_credentials}}, \code{\link{ssh_exec}},
-  \code{\link{ssh_tunnel}}
+Other ssh: 
+\code{\link{scp}},
+\code{\link{ssh_credentials}},
+\code{\link{ssh_exec}},
+\code{\link{ssh_tunnel}()}
 }
 \concept{ssh}
