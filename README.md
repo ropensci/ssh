@@ -29,13 +29,13 @@ Installation from source on MacOS or Linux requires [`libssh`](https://www.libss
 sudo apt-get install -y libssh-dev
 ```
 
-On __Fedora__ we need [libssh-devel](https://apps.fedoraproject.org/packages/libssh-devel):
+On __Fedora__ we need [libssh-devel](https://src.fedoraproject.org/rpms/libssh):
 
 ```
 sudo yum install libssh-devel
 ````
 
-On __CentOS / RHEL__ we install [libssh-devel](https://apps.fedoraproject.org/packages/libssh-devel) via EPEL:
+On __CentOS / RHEL__ we install [libssh-devel](https://src.fedoraproject.org/rpms/libssh) via EPEL:
 
 ```
 sudo yum install epel-release
