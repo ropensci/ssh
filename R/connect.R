@@ -74,10 +74,9 @@ parse_host <- function(str, default_port){
   str <- sub("^@", "", str)
   str <- sub(":$", "", str)
   x <- strsplit(str, "@", fixed = TRUE)[[1]]
-  if(length(x) > 2) stop("host string contains multiple '@' characters")
   host <- if(length(x) > 1){
-    user <- x[1]
-    x[2]
+    user <- paste(utils::head(x, -1), collapse = '@')
+    utils::tail(x, 1)
   } else {
     user <- me()
     x[1]
