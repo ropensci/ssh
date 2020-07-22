@@ -48,6 +48,13 @@ On __OS-X__ use [libssh](https://github.com/Homebrew/homebrew-core/blob/master/F
 brew install libssh
 ```
 
+Using __conda__ (need a conda R environment `conda create -n Renv r-base r-essentials`)
+
+```
+conda install --channel conda-forge r-ssh
+```
+
+If you have issues with the conda installation please submit an issue in [`conda-forge/r-ssh-feedstock`](https://github.com/conda-forge/r-ssh-feedstock/issues)
 ## Getting Started
 
 First create an ssh session by connecting to an SSH server. You can either use private key or passphrase authentication: 
