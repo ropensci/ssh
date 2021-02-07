@@ -108,7 +108,7 @@ static int wait_for_fd(int fd, int port){
   fd_set rfds;
   int active = 0;
   while(active == 0){
-    Rprintf("\r%c Waiting for connetion on port %d... ", spinner(), port);
+    Rprintf("\r%c Waiting for connection on port %d... ", spinner(), port);
     FD_ZERO(&rfds);
     FD_SET(fd, &rfds);
     active = select(fd+1, &rfds, NULL, NULL, &tv);
