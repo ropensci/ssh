@@ -23,6 +23,6 @@ Suggests:
     testthat,
     mongolite
 Language: en-GB
-URL: https://docs.ropensci.org/ssh (website),
+URL: https://docs.ropensci.org/ssh/ (website),
     https://github.com/ropensci/ssh (devel)
 VignetteBuilder: knitr
