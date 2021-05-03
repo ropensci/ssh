@@ -1,4 +1,4 @@
-VERSION = 0.8.6
+VERSION = 0.9.5
 RWINLIB = ../windows/libssh-${VERSION}
 
 PKG_CPPFLAGS = -DLIBSSH_STATIC \
