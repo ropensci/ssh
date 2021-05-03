@@ -5,7 +5,7 @@ PKG_CPPFLAGS = -DLIBSSH_STATIC \
 	-I${RWINLIB}/include
 
 PKG_LIBS = \
-	-L${RWINLIB}/lib${R_ARCH} \
+	-L${RWINLIB}/lib${R_ARCH}${CRT} \
 	-lssh -lcrypto -lz -lws2_32 -lgdi32 -lcrypt32
 
 all: clean winlibs
