@@ -22,7 +22,7 @@
 #' @rdname ssh
 #' @aliases ssh
 #' @importFrom askpass askpass
-#' @param host an ssh server string of the form `[user@]hostname[:@port]`. An ipv6
+#' @param host an ssh server string of the form `[user@]hostname[:port]`. An ipv6
 #' hostname should be wrapped in brackets like this: `[2001:db8::1]:80`.
 #' @param passwd either a string or a callback function for password prompt
 #' @param keyfile path to private key file. Must be in OpenSSH format (see details)
