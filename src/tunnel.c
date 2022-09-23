@@ -1,5 +1,4 @@
 #include <R.h> /* for R_ProcessEvents() */
-#include "myssh.h"
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -15,6 +14,8 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #endif
+
+#include "myssh.h"
 
 #ifdef _WIN32
 #define NONBLOCK_OK (WSAGetLastError() == WSAEWOULDBLOCK)

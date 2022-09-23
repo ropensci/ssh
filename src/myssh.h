@@ -4,7 +4,13 @@
 #include <Rinternals.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef __GNUC__
+#if defined(__linux__) && defined(__GNUC__)
+#include <stdarg.h>
+#include <unistd.h>
+#include <inttypes.h>
+#include <sys/types.h>
+#include <sys/select.h>
+#include <netdb.h>
 #define __attribute__(x)
 #endif
 #include <libssh/libssh.h>
