@@ -2,10 +2,14 @@
 #define STRICT_R_HEADERS
 
 #include <Rinternals.h>
-#include <libssh/libssh.h>
-#include <libssh/callbacks.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef __GNUC__
+#define __attribute__(x)
+#endif
+#include <libssh/libssh.h>
+#include <libssh/callbacks.h>
+
 
 /* Debian ships with libssh 0.8.0 which has a bug so it looks like 0.7.0 */
 #if defined(LIBSSH_VERSION_INT) && (LIBSSH_VERSION_INT >= SSH_VERSION_INT(0,8,0) || LIBSSH_VERSION_INT == SSH_VERSION_INT(0,7,0))
