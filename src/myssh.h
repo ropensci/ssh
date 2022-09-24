@@ -4,15 +4,6 @@
 #include <Rinternals.h>
 #include <stdlib.h>
 #include <string.h>
-#if defined(__linux__) && defined(__GNUC__)
-#include <stdarg.h>
-#include <unistd.h>
-#include <inttypes.h>
-#include <sys/types.h>
-#include <sys/select.h>
-#include <netdb.h>
-#define __attribute__(x)
-#endif
 #include <libssh/libssh.h>
 #include <libssh/callbacks.h>
 
@@ -28,3 +19,10 @@
 ssh_session ssh_ptr_get(SEXP ptr);
 int pending_interrupt();
 void assert_channel(int rc, const char * what, ssh_channel channel);
+
+/* Workaround copied from libcurl: https://github.com/curl/curl/pull/9383 */
+#if defined(__GNUC__) &&                        \
+(LIBSSH_VERSION_MINOR >= 10) ||                 \
+(LIBSSH_VERSION_MAJOR > 0)
+/*deprecate*/ #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
