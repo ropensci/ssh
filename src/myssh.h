@@ -20,9 +20,7 @@ ssh_session ssh_ptr_get(SEXP ptr);
 int pending_interrupt();
 void assert_channel(int rc, const char * what, ssh_channel channel);
 
-/* Workaround copied from libcurl: https://github.com/curl/curl/pull/9383 */
-#if defined(__GNUC__) &&                        \
-(LIBSSH_VERSION_MINOR >= 10) ||                 \
-(LIBSSH_VERSION_MAJOR > 0)
-/*deprecate*/ #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+/* Workaround from libcurl: https://github.com/curl/curl/pull/9383/files */
+#if defined(__GNUC__) && (LIBSSH_VERSION_MINOR >= 10) || (LIBSSH_VERSION_MAJOR > 0)
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
