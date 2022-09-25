@@ -1,9 +1,6 @@
 # SSH
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Build Status](https://travis-ci.org/ropensci/ssh.svg?branch=master)](https://travis-ci.org/ropensci/ssh)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/ropensci/ssh?branch=master&svg=true)](https://ci.appveyor.com/project/jeroen/ssh)
-[![Coverage Status](https://codecov.io/github/ropensci/ssh/coverage.svg?branch=master)](https://codecov.io/github/ropensci/ssh?branch=master)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/ssh)](http://cran.r-project.org/package=ssh)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/ssh)](http://cran.r-project.org/web/packages/ssh/index.html)
 
