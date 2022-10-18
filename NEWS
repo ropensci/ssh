@@ -1,3 +1,6 @@
+0.8.2
+  - Fix strict-prototypes warnings
+
 0.8.1
   - Silence libssh deprecation warning about SCP (we still want to support it)
 

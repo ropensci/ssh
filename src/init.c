@@ -9,7 +9,7 @@
 /* .Call calls */
 extern SEXP C_blocking_tunnel(SEXP, SEXP, SEXP, SEXP);
 extern SEXP C_disconnect_session(SEXP);
-extern SEXP C_libssh_version();
+extern SEXP C_libssh_version(void);
 extern SEXP C_scp_download_recursive(SEXP, SEXP, SEXP);
 extern SEXP C_scp_read_file(SEXP, SEXP);
 extern SEXP C_scp_write_file(SEXP, SEXP, SEXP);
@@ -18,7 +18,7 @@ extern SEXP C_ssh_exec(SEXP, SEXP, SEXP, SEXP);
 extern SEXP C_ssh_info(SEXP);
 extern SEXP C_start_session(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP R_ssh_new_file_writer(SEXP);
-extern SEXP R_ssh_total_writers();
+extern SEXP R_ssh_total_writers(void);
 extern SEXP R_ssh_write_file_writer(SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {

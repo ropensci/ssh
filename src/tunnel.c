@@ -67,7 +67,7 @@ static void check_interrupt_fn(void *dummy) {
   R_CheckUserInterrupt();
 }
 
-int pending_interrupt() {
+int pending_interrupt(void) {
   return !(R_ToplevelExec(check_interrupt_fn, NULL));
 }
 
@@ -81,7 +81,7 @@ static void sys_message(const char * what){
   Rprintf("%s in %s\n", getsyserror(), what);
 }
 
-static char spinner(){
+static char spinner(void){
   static int x;
   x = (x + 1) % 4;
   switch(x){

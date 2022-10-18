@@ -17,7 +17,7 @@
 
 #define make_string(x) x ? Rf_mkString(x) : Rf_ScalarString(NA_STRING)
 ssh_session ssh_ptr_get(SEXP ptr);
-int pending_interrupt();
+int pending_interrupt(void);
 void assert_channel(int rc, const char * what, ssh_channel channel);
 
 /* Workaround from libcurl: https://github.com/curl/curl/pull/9383/files */
