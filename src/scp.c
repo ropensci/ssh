@@ -6,6 +6,7 @@
  */
 
 #include <libgen.h>
+#include <sys/stat.h>
 #include "myssh.h"
 
 static void assert_scp(int rc, const char * what, ssh_scp scp, ssh_session ssh){
@@ -177,9 +178,15 @@ SEXP C_scp_write_recursive(SEXP ptr, SEXP sources, SEXP sizes, SEXP paths, SEXP 
     if(file == NA_STRING)
       continue;
 
+    // try to retain file mode
+    struct stat perm = {0};
+    if(stat(CHAR(STRING_ELT(sources, i)), &perm) < 0)
+      Rf_error("Failed to get permissions for file %s", CHAR(STRING_ELT(sources, i)));
+    int statchmod = perm.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO);
+
     //create new file
     double size = REAL(sizes)[i];
-    assert_scp(ssh_scp_push_file(scp, CHAR(file), size, 420L), "ssh_scp_push_file", scp, ssh);
+    assert_scp(ssh_scp_push_file(scp, CHAR(file), size, statchmod), "ssh_scp_push_file", scp, ssh);
 
     //write file to channel
     int read = 0;
