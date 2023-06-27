@@ -1,4 +1,5 @@
 0.8.3
+  - Windows: update to libssh 0.10.5
   - scp_upload() now copies the file mode permissions similar to scp -p
 
 0.8.2
