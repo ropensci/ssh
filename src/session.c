@@ -241,6 +241,6 @@ SEXP C_disconnect_session(SEXP ptr){
   return R_NilValue;
 }
 
-SEXP C_libssh_version(){
+SEXP C_libssh_version(void){
   return Rf_mkString(SSH_STRINGIFY(LIBSSH_VERSION));
 }

@@ -7,3 +7,4 @@
 \.in\.Rmd$
 README.md$
 ^configure.log$
+^\.github$

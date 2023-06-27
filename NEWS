@@ -1,5 +1,13 @@
-0.9.0
+0.8.3
+  - Windows: update to libssh 0.10.5
+  - scp_upload() now copies the file mode permissions similar to scp -p
   - ssh_session_info() now works for disconnected sessions
+
+0.8.2
+  - Fix strict-prototypes warnings
+
+0.8.1
+  - Silence libssh deprecation warning about SCP (we still want to support it)
 
 0.8.0
   - Windows/MacOS: update to libssh 0.9.5
