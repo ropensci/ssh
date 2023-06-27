@@ -51,7 +51,8 @@ ssh_connect <- function(host, keyfile = NULL, passwd = askpass, verbose = FALSE)
 #' @aliases ssh_info
 #' @useDynLib ssh C_ssh_info
 ssh_session_info <- function(session){
-  assert_session(session)
+  if(!inherits(session, "ssh_session"))
+    stop('Argument "session" must be an ssh session', call. = FALSE)
   out <- .Call(C_ssh_info, session)
   structure(out, names = c("user", "host", "identity", "port", "connected", "sha1"))
 }
@@ -109,14 +110,16 @@ me <- function(){
 }
 
 assert_session <- function(x){
-  if(!inherits(x, "ssh_session"))
-    stop('Argument "session" must be an ssh session', call. = FALSE)
+  info <- ssh_info(x)
+  if(isFALSE(info$connected))
+    stop('SSH session has been disconnected. Please connect to a new session', call. = FALSE)
 }
 
 #' @export
 print.ssh_session <- function(x, ...){
   info <- ssh_session_info(x)
-  cat(sprintf("<ssh session>\nconnected: %s@%s:%d\nserver: %s\n", info$user, info$host, info$port, info$sha1))
+  status <- ifelse(info$connected, 'connected', 'disconnected')
+  cat(sprintf("<ssh session>\n%s@%s:%d (%s)\nserver: %s\n", info$user, info$host, info$port, status, info$sha1))
 }
 
 #' @export

@@ -4,8 +4,8 @@ ssh_session ssh_ptr_get(SEXP ptr){
   ssh_session ssh = (ssh_session) R_ExternalPtrAddr(ptr);
   if(ssh == NULL)
     Rf_error("SSH session pointer is dead");
-  if(!ssh_is_connected(ssh))
-    Rf_error("ssh session has been disconnected");
+  //if(!ssh_is_connected(ssh))
+  //  Rf_error("ssh session has been disconnected");
   return ssh;
 }
 
@@ -212,8 +212,10 @@ SEXP C_ssh_info(SEXP ptr){
   ssh_key key;
   unsigned char * hash = NULL;
   size_t hlen = 0;
-  assert_or_disconnect(myssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
-  assert_or_disconnect(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
+  if (connected) {
+    assert_or_disconnect(myssh_get_publickey(ssh, &key), "ssh_get_publickey", ssh);
+    assert_or_disconnect(ssh_get_publickey_hash(key, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen), "ssh_get_publickey_hash", ssh);
+  }
 
   SEXP out = PROTECT(Rf_allocVector(VECSXP, 6));
   SET_VECTOR_ELT(out, 0, make_string(user));
@@ -221,8 +223,7 @@ SEXP C_ssh_info(SEXP ptr){
   SET_VECTOR_ELT(out, 2, make_string(identity));
   SET_VECTOR_ELT(out, 3, Rf_ScalarInteger(port));
   SET_VECTOR_ELT(out, 4, Rf_ScalarLogical(connected));
-  SET_VECTOR_ELT(out, 5, make_string(ssh_get_hexa(hash, hlen)));
-
+  SET_VECTOR_ELT(out, 5, connected ? make_string(ssh_get_hexa(hash, hlen)) : Rf_ScalarString(NA_STRING));
   if(user) ssh_string_free_char(user);
   if(host) ssh_string_free_char(host);
   if(identity) ssh_string_free_char(identity);
