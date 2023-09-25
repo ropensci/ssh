@@ -1,18 +1,17 @@
-VERSION = 0.10.5
-RWINLIB = ../windows/libssh-$(VERSION)
-TARGET = lib$(subst gcc,,$(COMPILED_BY))$(R_ARCH)
+RWINLIB = ../windows/libssh
+OLDLIBDIR = lib$(subst gcc,,$(COMPILED_BY))$(R_ARCH)
 
 PKG_CPPFLAGS = -I$(RWINLIB)/include -DLIBSSH_STATIC
 
 PKG_LIBS = \
-	-L$(RWINLIB)/$(TARGET) \
-	-L$(RWINLIB)/lib$(R_ARCH) \
+	-L$(RWINLIB)/$(OLDLIBDIR) \
+	-L$(RWINLIB)/lib \
 	-lssh -lcrypto -lz -lws2_32 -lgdi32 -lcrypt32
 
 all: clean winlibs
 
 winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R" $(VERSION)
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
 
 clean:
 	rm -f $(SHLIB) $(OBJECTS)
