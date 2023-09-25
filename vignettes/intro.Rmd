@@ -1,6 +1,6 @@
 ---
 title: "Secure Shell (SSH) Client for R"
-date: "2019-03-26"
+date: "2023-09-25"
 output:
   html_document:
     fig_caption: false
@@ -45,7 +45,7 @@ sudo yum install epel-release
 sudo yum install libssh-devel
 ```
 
-On __OS-X__ use [libssh](https://github.com/Homebrew/homebrew-core/blob/master/Formula/libssh.rb) from Homebrew:
+On __OS-X__ use libssh from Homebrew:
 
 ```
 brew install libssh
@@ -64,8 +64,8 @@ print(session)
 
 ```
 <ssh session>
-connected: jeroen@dev.opencpu.org:22
-server: 1c:86:dc:b9:77:2c:74:ee:2d:00:49:6f:2e:c8:b2:61:5e:14:53:73
+jeroen@dev.opencpu.org:22 (connected)
+server: 90:eb:52:6b:ee:fc:de:f1:c0:66:6c:53:82:dd:ce:80:d3:85:1e:d8
 ```
 
 Once established, a session is closed automatically by the garbage collector when the object goes out of scope or when R quits. You can also manually close it using `ssh_disconnect()` but this is not strictly needed.
@@ -112,15 +112,15 @@ ssh_key_info()
 
 ```
 $key
-[1] "/Users/jeroen/.ssh/id_rsa"
+[1] "/Users/jeroen/.ssh/id_ed25519"
 
 $pubkey
-[1] "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDwI/G2v42n/fVFbuyOL/7eh06MOK71djbe7wr8op0LcMbCiMOHOFdMRpb+UcwlfnXDYWwNZsfr3l4Hvfbdi5CesDwZmx4FQ4BC4e+2IRqCbwknVwdIMfBwLWd9HNs8hJ8M7YW4lt0TucMtVkzGN4wFR+onvzyU0VSiSiT1JQUY+7g4YMJlmhKN3lES+as1RFMExLosFlzydD7o35nMuKp1VzdkUaWm3xjFCTl7MVl6cbCWh7m3IDl95tTT0jH+pxvK2Vgb3u+r+tH7dWbbjm9tkwH7NS5HwEjy08cKUv+8BUnDLC27EuK2/k+Ro6BsEDHmq0z0nf6FgpTXQ0iJxnUZ"
+[1] "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILGN+5tybmwKhcxvnwPSKlrp39Ni1gMD0UhV4gCxHg/x"
 ```
 
 ## Execute Script or Command
 
-Run a command or script on the host and block while it runs. By default stdout and stderr are steamed directly back to the client. This function returns the exit status of the remote command (hence it does not automatically error for an unsuccessful exit status). 
+Run a command or script on the host and block while it runs. By default stdout and stderr are steamed directly back to the client. This function returns the exit status of the remote command (hence it does not automatically error for an unsuccessful exit status).
 
 
 ```r
@@ -184,8 +184,8 @@ cat(rawToChar(out$stdout))
 
 ```
 
-R version 3.5.3 (2019-03-11) -- "Great Truth"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.1.2 (2021-11-01) -- "Bird Hippie"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -203,8 +203,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > rnorm(10)
- [1] -0.4657579  0.1628843 -1.8308908 -1.4333284 -1.6689843 -0.3603318
- [7] -0.3299621 -0.2162147  1.0788035 -0.9536821
+ [1]  0.9324406  0.7037370  0.5538034 -0.8127880 -0.8670494 -0.6880066
+ [7] -0.7765106  1.1540114 -1.6692443 -0.5502898
 > 
 > 
 ```
