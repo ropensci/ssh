@@ -6,7 +6,7 @@ PKG_CPPFLAGS = -I$(RWINLIB)/include -DLIBSSH_STATIC
 PKG_LIBS = \
 	-L$(RWINLIB)/$(OLDLIBDIR) \
 	-L$(RWINLIB)/lib \
-	-lssh -lcrypto -lz -lws2_32 -lgdi32 -lcrypt32
+	-lssh -lcrypto -lz -lpthread -lws2_32 -lgdi32 -lcrypt32
 
 all: clean winlibs
 
