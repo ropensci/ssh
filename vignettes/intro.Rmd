@@ -1,6 +1,6 @@
 ---
 title: "Secure Shell (SSH) Client for R"
-date: "2023-09-25"
+date: "2023-10-16"
 output:
   html_document:
     fig_caption: false
@@ -26,7 +26,7 @@ On Windows or MacOS you can install the binary package directly from CRAN:
 install.packages("ssh")
 ```
 
-Installation from source requires [`libssh`](https://www.libssh.org/) (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
+Installation from source requires `libssh` (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
 
 ```
 sudo apt-get install -y libssh-dev
@@ -203,8 +203,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > rnorm(10)
- [1]  0.9324406  0.7037370  0.5538034 -0.8127880 -0.8670494 -0.6880066
- [7] -0.7765106  1.1540114 -1.6692443 -0.5502898
+ [1] -0.3837970  0.9754719  0.9999716 -0.2634097  0.1845797 -0.5664418
+ [7]  0.6975547 -0.2063897 -0.7263869  2.3826802
 > 
 > 
 ```

@@ -38,7 +38,7 @@ On Windows or MacOS you can install the binary package directly from CRAN:
 install.packages("ssh")
 ```
 
-Installation from source requires [`libssh`](https://www.libssh.org/) (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
+Installation from source requires `libssh` (which is __not__ `libssh2`). On __Debian__ or __Ubuntu__ use [libssh-dev](https://packages.debian.org/testing/libssh-dev):
 
 ```
 sudo apt-get install -y libssh-dev
