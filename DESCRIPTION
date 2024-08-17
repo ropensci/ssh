@@ -25,5 +25,5 @@ Suggests:
 Language: en-GB
 URL: https://docs.ropensci.org/ssh/
     https://ropensci.r-universe.dev/ssh
-BugReports: https://github.com/ropensci/ssh
+BugReports: https://github.com/ropensci/ssh/issues
 VignetteBuilder: knitr
