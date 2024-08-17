@@ -41,12 +41,13 @@ static SEXP dirvec_to_r(char ** dirvec, int depth){
 
 static SEXP stream_to_r(ssh_scp scp){
   R_xlen_t size = ssh_scp_request_get_size64(scp);
-  SEXP out = Rf_allocVector(RAWSXP, size);
+  SEXP out = PROTECT(Rf_allocVector(RAWSXP, size));
   unsigned char * ptr = RAW(out);
   size_t read_bytes = 0;
   do {
     if(pending_interrupt()){
       ssh_scp_deny_request(scp, "user interrupt");
+      UNPROTECT(1);
       return NULL;
     }
     read_bytes = ssh_scp_read(scp, ptr, size);
@@ -54,6 +55,7 @@ static SEXP stream_to_r(ssh_scp scp){
     size -= read_bytes;
     //REprintf("\r Remaining: %lld bytes", size);
   } while(size != 0);
+  UNPROTECT(1);
   return out;
 }
 
