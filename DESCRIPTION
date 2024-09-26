@@ -10,7 +10,7 @@ Description: Connect to a remote server over SSH to transfer files via SCP,
 License: MIT + file LICENSE
 Encoding: UTF-8
 SystemRequirements: libssh >= 0.6.0 (the original, not libssh2)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 Roxygen: list(markdown = TRUE)
 Imports: 
     credentials,

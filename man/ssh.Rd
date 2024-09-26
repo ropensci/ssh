@@ -18,7 +18,7 @@ ssh_disconnect(session)
 libssh_version()
 }
 \arguments{
-\item{host}{an ssh server string of the form \verb{[user@]hostname[:@port]}. An ipv6
+\item{host}{an ssh server string of the form \verb{[user@]hostname[:port]}. An ipv6
 hostname should be wrapped in brackets like this: \verb{[2001:db8::1]:80}.}
 
 \item{keyfile}{path to private key file. Must be in OpenSSH format (see details)}
