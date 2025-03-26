@@ -1,4 +1,4 @@
-RWINLIB = ../windows/libssh
+RWINLIB = ../.deps/libssh
 OLDLIBDIR = lib$(subst gcc,,$(COMPILED_BY))$(R_ARCH)
 
 PKG_CPPFLAGS = -I$(RWINLIB)/include -DLIBSSH_STATIC
@@ -8,12 +8,13 @@ PKG_LIBS = \
 	-L$(RWINLIB)/lib \
 	-lssh -lcrypto -lz -lpthread -lws2_32 -lgdi32 -lcrypt32 -liphlpapi
 
-all: clean winlibs
+all: $(SHLIB) cleanup
 
-winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
+# Needed for parallel make
+$(OBJECTS): | $(RWINLIB)
 
-clean:
-	rm -f $(SHLIB) $(OBJECTS)
+$(RWINLIB):
+	@"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
 
-.PHONY: all winlibs clean
+cleanup: $(SHLIB)
+	@rm -Rf $(RWINLIB)

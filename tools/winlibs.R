@@ -1,5 +1,5 @@
-if(!file.exists("../windows/protobuf/include/libssh/libssh.h")){
-  unlink("../windows", recursive = TRUE)
+if(!file.exists('session.o') && !file.exists("../.deps/protobuf/include/libssh/libssh.h")){
+  unlink("../.deps", recursive = TRUE)
   url <- if(grepl("aarch", R.version$platform)){
     "https://github.com/r-windows/bundles/releases/download/libssh-0.11.0/libssh-0.11.0-clang-aarch64.tar.xz"
   } else if(grepl("clang", Sys.getenv('R_COMPILED_BY'))){
@@ -10,9 +10,10 @@ if(!file.exists("../windows/protobuf/include/libssh/libssh.h")){
     "https://github.com/rwinlib/libssh/archive/v0.10.5.tar.gz"
   }
   download.file(url, basename(url), quiet = TRUE)
-  dir.create("../windows", showWarnings = FALSE)
-  untar(basename(url), exdir = "../windows", tar = 'internal')
+  dir.create("../.deps", showWarnings = FALSE)
+  untar(basename(url), exdir = "../.deps", tar = 'internal')
   unlink(basename(url))
-  setwd("../windows")
+  setwd("../.deps")
   file.rename(list.files(), 'libssh')
+  invisible()
 }
